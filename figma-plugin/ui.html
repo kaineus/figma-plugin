@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    body {
+      font-family: Inter, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 12px;
+      color: #333;
+      padding: 16px;
+      background: #fff;
+    }
+    h1 {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 16px;
+      color: #000;
+    }
+    .section {
+      margin-bottom: 20px;
+    }
+    .section-title {
+      font-size: 11px;
+      font-weight: 600;
+      color: #666;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-bottom: 8px;
+    }
+    .btn {
+      width: 100%;
+      padding: 10px 16px;
+      border: none;
+      border-radius: 6px;
+      font-size: 12px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-bottom: 8px;
+      transition: all 0.15s ease;
+    }
+    .btn-primary {
+      background: #18A0FB;
+      color: white;
+    }
+    .btn-primary:hover {
+      background: #0D8DE5;
+    }
+    .btn-secondary {
+      background: #F0F0F0;
+      color: #333;
+    }
+    .btn-secondary:hover {
+      background: #E5E5E5;
+    }
+    .btn-success {
+      background: #1BC47D;
+      color: white;
+    }
+    .btn-success:hover {
+      background: #17A86C;
+    }
+    .status {
+      padding: 12px;
+      background: #F5F5F5;
+      border-radius: 6px;
+      font-size: 11px;
+      color: #666;
+      margin-top: 16px;
+      max-height: 120px;
+      overflow-y: auto;
+    }
+    .status.success {
+      background: #E8F8F0;
+      color: #1A7F5A;
+    }
+    .status.error {
+      background: #FDECEA;
+      color: #C53030;
+    }
+    .divider {
+      height: 1px;
+      background: #E5E5E5;
+      margin: 16px 0;
+    }
+    .input-group {
+      margin-bottom: 12px;
+    }
+    .input-group label {
+      display: block;
+      font-size: 11px;
+      font-weight: 500;
+      color: #666;
+      margin-bottom: 4px;
+    }
+    .input-group input {
+      width: 100%;
+      padding: 8px 10px;
+      border: 1px solid #E0E0E0;
+      border-radius: 4px;
+      font-size: 12px;
+    }
+    .input-group input:focus {
+      outline: none;
+      border-color: #18A0FB;
+    }
+  </style>
+</head>
+<body>
+  <h1>🎨 PF Design System Generator</h1>
+
+  <div class="section">
+    <div class="section-title">브랜드 설정</div>
+    <div class="input-group">
+      <label>Primary Color</label>
+      <input type="color" id="primaryColor" value="#6366F1">
+    </div>
+    <div class="input-group">
+      <label>Secondary Color</label>
+      <input type="color" id="secondaryColor" value="#8B5CF6">
+    </div>
+  </div>
+
+  <div class="divider"></div>
+
+  <div class="section">
+    <div class="section-title">1. 페이지 구조</div>
+    <button class="btn btn-secondary" onclick="createPages()">📄 페이지 구조 생성</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">2. Foundations</div>
+    <button class="btn btn-secondary" onclick="createVariables()">🎨 Variables 생성</button>
+    <button class="btn btn-secondary" onclick="createTypography()">📝 Typography 생성</button>
+    <button class="btn btn-secondary" onclick="createColors()">🌈 Color Palette 생성</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">3. Components</div>
+    <button class="btn btn-secondary" onclick="createButtons()">🔘 Buttons 생성</button>
+    <button class="btn btn-secondary" onclick="createCards()">🃏 Cards 생성</button>
+    <button class="btn btn-secondary" onclick="createBadges()">🏷️ Badges 생성</button>
+  </div>
+
+  <div class="divider"></div>
+
+  <button class="btn btn-primary" onclick="createAll()">🚀 전체 디자인 시스템 생성</button>
+
+  <div id="status" class="status">준비됨. 버튼을 클릭하여 시작하세요.</div>
+
+  <script>
+    function updateStatus(message, type = 'normal') {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = 'status' + (type !== 'normal' ? ' ' + type : '');
+    }
+
+    function getColors() {
+      return {
+        primary: document.getElementById('primaryColor').value,
+        secondary: document.getElementById('secondaryColor').value
+      };
+    }
+
+    function createPages() {
+      updateStatus('페이지 구조 생성 중...');
+      parent.postMessage({ pluginMessage: { type: 'create-pages' } }, '*');
+    }
+
+    function createVariables() {
+      updateStatus('Variables 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-variables', colors } }, '*');
+    }
+
+    function createTypography() {
+      updateStatus('Typography 생성 중...');
+      parent.postMessage({ pluginMessage: { type: 'create-typography' } }, '*');
+    }
+
+    function createColors() {
+      updateStatus('Color Palette 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-colors', colors } }, '*');
+    }
+
+    function createButtons() {
+      updateStatus('Buttons 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-buttons', colors } }, '*');
+    }
+
+    function createCards() {
+      updateStatus('Cards 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-cards', colors } }, '*');
+    }
+
+    function createBadges() {
+      updateStatus('Badges 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-badges', colors } }, '*');
+    }
+
+    function createAll() {
+      updateStatus('전체 디자인 시스템 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-all', colors } }, '*');
+    }
+
+    window.onmessage = (event) => {
+      const msg = event.data.pluginMessage;
+      if (msg.type === 'status') {
+        updateStatus(msg.message, msg.status);
+      }
+    };
+  </script>
+</body>
+</html>
