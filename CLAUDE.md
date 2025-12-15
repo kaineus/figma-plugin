@@ -1,155 +1,147 @@
-# Figma MCP Project
+# PF Design System Generator
 
-## 프로젝트 목표
+## 프로젝트 개요
 
-MCP(Model Context Protocol)를 활용하여 Claude가 프롬프트 기반으로 Figma에 직접 디자인할 수 있는 시스템 구축
+Figma 플러그인으로 디자인 시스템을 자동 생성하는 도구
 
-## 아키텍처
+**GitHub:** https://github.com/kaineus/figma-plugin
 
-```
-┌─────────────┐     ┌─────────────┐     ┌──────────────────┐     ┌─────────┐
-│   사용자     │     │   Claude    │     │ PLX_FIGMA_PLUGIN │     │  Figma  │
-│  프롬프트    │ ──▶ │             │ ──▶ │   (MCP Server)   │ ──▶ │   API   │
-└─────────────┘     └─────────────┘     └──────────────────┘     └─────────┘
-```
+## 현재 상태 (2024-12-15)
 
-## 핵심 컴포넌트
+### 완료된 작업
 
-### 1. PLX_FIGMA_PLUGIN (MCP Server)
-- Figma Plugin 형태로 동작
-- MCP 프로토콜을 통해 Claude와 통신
-- Figma Plugin API를 사용하여 디자인 생성/수정
-- 디자인 시스템 규칙 적용
+#### Foundations
+- [x] **Variables** - 4개 Collection 구현
+  - Color Primitives: 원시 색상 (50-900 스케일)
+  - Color: Semantic 색상 (Light/Dark 모드, Variable Alias)
+  - Size: spacing, radius
+  - Typography: font-size, line-height, letter-spacing
+- [x] **Typography** - Display, Heading, Body, Caption 문서화
+- [x] **Color Palette** - Primary, Secondary, Success, Warning, Danger, Gray
 
-### 2. MCP Tools (예상)
-- `create_frame` - 프레임/아트보드 생성
-- `create_component` - 컴포넌트 생성
-- `apply_style` - 스타일 적용
-- `get_design_tokens` - 디자인 토큰 조회
-- `place_component` - 기존 컴포넌트 배치
+#### Components
+- [x] **Buttons** - Type × State × Size variants, Component Set
+- [x] **Cards** - Style (Default, Outlined, Elevated) × Size (SM, MD, LG)
+- [x] **Badges** - Type (Primary, Success, Warning, Danger, Gray) × Size
 
-### 3. 디자인 시스템 연동
-- 참조 디자인 시스템의 컴포넌트 활용
-- 디자인 토큰(색상, 타이포, 스페이싱) 자동 적용
-- 일관된 디자인 규칙 유지
+#### 인프라
+- [x] GitHub 저장소 연결 및 푸시
+- [x] README 작성
 
-## 참조 Figma 파일
+### 다음 작업 (TODO)
 
-### Simple Design System (Community)
-- **File Key:** `vTN7EhiXreOi6Dc8DGubuW`
-- **URL:** https://www.figma.com/design/vTN7EhiXreOi6Dc8DGubuW/Simple-Design-System--Community-
+#### 추가 컴포넌트
+- [ ] Inputs (Text, Password, Search)
+- [ ] Checkbox, Radio, Toggle
+- [ ] Select, Dropdown
+- [ ] Modal, Dialog
+- [ ] Toast, Notification
+- [ ] Tabs, Navigation
 
-#### 페이지 구조
-| 카테고리 | 페이지 |
-|---------|--------|
-| 기본 | Cover, Foundations, Icons |
-| 가이드 | Examples, Composition guide |
-| 컴포넌트 | Accordion, AI Chat, Avatars, Buttons, Calendar, Cards, Dialog, Inputs, Menu, Navigation, Notification, Pagination, Tabs, Tags, Text, Tooltip |
-| 템플릿 | Forms, Sections |
-| 기타 | Utilities, Component Playground |
+#### 개선 사항
+- [ ] `bg/brand-subtle`, `bg/tertiary` Variable 추가 (코드에서 참조하지만 미생성)
+- [ ] `createBadges`에 Bold, Regular 폰트 로드 추가
+- [ ] 컴포넌트에 Variable 바인딩 강화
 
-## Figma API 사용법
-
-### 인증
-```bash
-curl -H "X-Figma-Token: <ACCESS_TOKEN>" "https://api.figma.com/v1/files/<FILE_KEY>"
-```
-
-### 주요 엔드포인트
-- `GET /v1/files/:key` - 파일 전체 조회
-- `GET /v1/files/:key/nodes?ids=:ids` - 특정 노드 조회
-- `GET /v1/files/:key/components` - 컴포넌트 목록
-- `GET /v1/files/:key/styles` - 스타일 목록
-- `GET /v1/files/:key/variables/local` - 로컬 변수 조회
+#### MCP 연동 (Phase 2)
+- [ ] MCP Server 구현
+- [ ] Claude ↔ Figma Plugin 실시간 통신
+- [ ] 프롬프트 기반 디자인 생성
 
 ## 프로젝트 구조
 
 ```
-PLX_FIGMA_PLUGIN/
-├── package.json              # 프로젝트 설정 및 의존성
-├── tsconfig.json             # TypeScript 설정
-├── tsconfig.server.json      # MCP Server용 TypeScript 설정
-├── CLAUDE.md                 # 프로젝트 문서
-├── plugin/                   # Figma Plugin
-│   ├── manifest.json         # 플러그인 메타데이터
-│   ├── code.ts               # 플러그인 메인 코드 (Figma API)
-│   ├── ui.html               # 플러그인 UI (WebSocket 클라이언트)
-│   └── dist/                 # 빌드 출력
-│       └── code.js
-└── server/                   # MCP Server
-    └── index.ts              # MCP Server + WebSocket Server
+FIGMA_MCP/
+├── CLAUDE.md                 # 프로젝트 문서 (이 파일)
+├── README.md                 # GitHub README
+├── .gitignore
+└── figma-plugin/
+    ├── manifest.json         # 플러그인 메타데이터
+    ├── code.ts               # 플러그인 메인 코드 (~1200줄)
+    ├── ui.html               # 플러그인 UI
+    ├── package.json
+    ├── tsconfig.json
+    └── dist/
+        └── code.js           # 빌드 출력 (43kb)
 ```
 
-## 개발 환경
+## 핵심 코드 구조 (code.ts)
 
-- **작업 디렉토리:** `C:\DEV\CLAUDE\FIGMA_MCP`
-- **플랫폼:** Windows
-- **Node.js:** >= 18.0.0
+### 주요 함수
 
-## 설치 및 실행
+| 함수 | 설명 | 라인 |
+|------|------|------|
+| `createPages()` | 페이지 구조 생성 | ~60 |
+| `createVariables()` | Variable Collections 생성 | ~100-400 |
+| `createTypography()` | Typography 문서화 | ~400-550 |
+| `createColors()` | Color Palette 문서화 | ~550-680 |
+| `createButtons()` | Button 컴포넌트 생성 | ~680-870 |
+| `createCards()` | Card 컴포넌트 생성 | ~870-1020 |
+| `createBadges()` | Badge 컴포넌트 생성 | ~1020-1180 |
 
-### 1. 의존성 설치
+### Variable 헬퍼 함수
+
+```typescript
+// Variable 찾기
+function findVariable(name: string): Variable | null
+
+// Fill에 Variable 적용
+function applyVariableToFill(node, variableName, fallbackColor): void
+
+// Stroke에 Variable 적용
+function applyVariableToStroke(node, variableName, fallbackColor): void
+```
+
+### Design Token 구조
+
+```
+Color Primitives (50-900)
+    ↓ VARIABLE_ALIAS
+Color (Semantic - bg/*, text/*, border/*)
+    ↓ setBoundVariableForPaint
+Components
+```
+
+**Semantic Color 매핑 규칙:**
+- `bg/*` → 밝은 톤 (예: primary/50)
+- `border/*` → 중간 톤 (예: primary/500)
+- `text/*` → 어두운 톤 (예: primary/700)
+- `*-solid` → 채워진 배경 (예: primary/500)
+
+## 개발 명령어
+
 ```bash
-npm install
+# 빌드
+cd figma-plugin && npm run build
+
+# Watch 모드
+cd figma-plugin && npm run watch
+
+# Git 커밋 (Conventional Commits)
+git commit -m "feat: description"
+git commit -m "fix: description"
+git commit -m "docs: description"
 ```
 
-### 2. 플러그인 빌드
-```bash
-npm run build:plugin
-```
+## Figma에서 테스트
 
-### 3. MCP Server 실행
-```bash
-npm run dev:server
-```
+1. Figma Desktop 실행
+2. Menu → Plugins → Development → Import plugin from manifest...
+3. `figma-plugin/manifest.json` 선택
+4. Plugins → Development → PF Design System Generator 실행
+5. Variables 먼저 생성 → 컴포넌트 생성
 
-### 4. Figma에서 플러그인 로드
-1. Figma Desktop 앱 실행
-2. Menu > Plugins > Development > Import plugin from manifest...
-3. `plugin/manifest.json` 선택
-4. Plugins > Development > PLX Figma Plugin 실행
+## 참조
 
-## MCP Server 설정
+### Simple Design System (Community)
+- **URL:** https://www.figma.com/design/vTN7EhiXreOi6Dc8DGubuW/Simple-Design-System--Community-
+- 참고용 디자인 시스템 (페이지 구조, 컴포넌트 레이아웃)
 
-Claude Desktop의 `claude_desktop_config.json`에 추가:
+### 글로벌 스킬스
+- `~/.claude/skills/github-pr-workflow` - Git 커밋/PR 워크플로우
+- `~/.claude/skills/github-issue-manager` - GitHub 이슈 생성
 
-```json
-{
-  "mcpServers": {
-    "plx-figma": {
-      "command": "node",
-      "args": ["C:\\DEV\\CLAUDE\\FIGMA_MCP\\dist\\server\\index.js"]
-    }
-  }
-}
-```
+## 알려진 이슈
 
-## MCP Tools (구현됨)
-
-| Tool | 설명 |
-|------|------|
-| `check_connection` | Figma Plugin 연결 상태 확인 |
-| `create_frame` | 프레임(아트보드) 생성 |
-| `create_rectangle` | 사각형 도형 생성 |
-| `create_text` | 텍스트 요소 생성 |
-| `get_selection` | 현재 선택된 요소 조회 |
-| `get_current_page` | 현재 페이지 정보 조회 |
-
-## TODO
-
-### Phase 1: PLX_FIGMA_PLUGIN 개발
-- [x] Figma Plugin 프로젝트 초기 설정
-- [x] MCP Server 프로토콜 구현
-- [x] 기본 MCP Tools 구현 (create_frame, create_rectangle, create_text)
-- [ ] npm install 및 빌드 테스트
-- [ ] Figma에서 플러그인 테스트
-
-### Phase 2: 디자인 시스템 연동
-- [ ] 디자인 토큰 추출 및 매핑
-- [ ] 컴포넌트 라이브러리 연동
-- [ ] 스타일 자동 적용 로직
-
-### Phase 3: 고급 기능
-- [ ] 프롬프트 기반 레이아웃 생성
-- [ ] 디자인 시스템 문서 자동 생성
-- [ ] Skills 개발 (재사용 가능한 디자인 패턴)
+1. **Missing Variables**: `bg/brand-subtle`, `bg/tertiary`가 코드에서 참조되지만 `createVariables()`에서 생성되지 않음 → fallback 색상 사용됨
+2. **Font Load**: `createBadges()`에서 Bold, Regular 폰트 미로드 → 문서 섹션 생성 시 에러 가능
