@@ -79,7 +79,7 @@ figma.ui.onmessage = async (msg) => {
   }
 
   if (msg.type === 'create-spacing-frame') {
-    createSpacingReference();
+    await createSpacingReference();
     figma.notify('스페이싱 가이드가 생성되었습니다.');
   }
 
@@ -117,16 +117,22 @@ async function createTypographyStyles() {
     textStyle.fontSize = style.fontSize;
     textStyle.lineHeight = { value: style.lineHeight, unit: 'PIXELS' };
     
-    // fontWeight는 폰트 패밀리에 따라 다르므로 기본값 사용
+    // fontWeight 설정은 폰트 패밀리와 스타일 조합으로 처리됨
+    // Figma는 fontName (family + style)을 사용하여 weight를 지정
+    // 예: { family: 'Inter', style: 'Bold' } 형태로 사용
+    // 현재는 스타일 이름만 생성하고, 사용자가 폰트를 직접 선택하도록 함
   }
 }
 
 // 스페이싱 참조 프레임 생성
-function createSpacingReference() {
+async function createSpacingReference() {
   const frame = figma.createFrame();
   frame.name = 'Spacing Reference';
   frame.resize(600, 400);
   frame.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+
+  // 기본 폰트 로드
+  await figma.loadFontAsync({ family: 'Inter', style: 'Regular' });
 
   let yOffset = 20;
   for (const [name, value] of Object.entries(spacing)) {
