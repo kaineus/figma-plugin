@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Design System Manager</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      font-size: 14px;
+      padding: 20px;
+      background: #ffffff;
+    }
+
+    h1 {
+      font-size: 18px;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #000;
+    }
+
+    .subtitle {
+      font-size: 12px;
+      color: #666;
+      margin-bottom: 24px;
+    }
+
+    .section {
+      margin-bottom: 24px;
+    }
+
+    .section-title {
+      font-size: 14px;
+      font-weight: 600;
+      margin-bottom: 12px;
+      color: #333;
+    }
+
+    .button {
+      width: 100%;
+      padding: 12px;
+      margin-bottom: 8px;
+      background: #18A0FB;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .button:hover {
+      background: #1590E8;
+    }
+
+    .button:active {
+      background: #0D7DD1;
+    }
+
+    .button.secondary {
+      background: #ffffff;
+      color: #18A0FB;
+      border: 1px solid #E5E5E5;
+    }
+
+    .button.secondary:hover {
+      background: #F5F5F5;
+    }
+
+    .info-box {
+      background: #F0F0F0;
+      padding: 12px;
+      border-radius: 6px;
+      font-size: 12px;
+      line-height: 1.5;
+      color: #333;
+      margin-bottom: 16px;
+    }
+
+    .feature-list {
+      list-style: none;
+      padding-left: 0;
+    }
+
+    .feature-list li {
+      padding: 8px 0;
+      border-bottom: 1px solid #E5E5E5;
+      font-size: 13px;
+      color: #333;
+    }
+
+    .feature-list li:last-child {
+      border-bottom: none;
+    }
+
+    .feature-list li::before {
+      content: "✓ ";
+      color: #18A0FB;
+      font-weight: bold;
+      margin-right: 8px;
+    }
+  </style>
+</head>
+<body>
+  <h1>Design System Manager</h1>
+  <p class="subtitle">디자인 시스템 생성 및 관리 도구</p>
+
+  <div class="section">
+    <div class="section-title">디자인 토큰 생성</div>
+    <button id="create-colors" class="button">색상 팔레트 생성</button>
+    <button id="create-typography" class="button">타이포그래피 생성</button>
+    <button id="create-spacing" class="button">스페이싱 가이드 생성</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">내보내기</div>
+    <button id="export-tokens" class="button secondary">디자인 토큰 내보내기</button>
+  </div>
+
+  <div class="info-box">
+    <strong>포함된 기능:</strong>
+    <ul class="feature-list">
+      <li>색상 시스템 (Primary, Secondary, Neutral)</li>
+      <li>타이포그래피 스타일 (H1-H6, Body, Caption)</li>
+      <li>스페이싱 시스템 (4px 기반)</li>
+      <li>디자인 토큰 JSON 내보내기</li>
+    </ul>
+  </div>
+
+  <script src="ui.js"></script>
+</body>
+</html>
