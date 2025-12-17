@@ -139,11 +139,22 @@ cd figma-plugin && npm run build
 # Watch 모드
 cd figma-plugin && npm run watch
 
+# 아이콘 추출 (Figma API에서 SVG 가져오기)
+export FIGMA_ACCESS_TOKEN="your_figma_token_here"
+cd figma-plugin && python extract-icons.py
+
 # Git 커밋 (Conventional Commits)
 git commit -m "feat: description"
 git commit -m "fix: description"
 git commit -m "docs: description"
 ```
+
+### Figma Access Token
+- **소스 파일:** https://www.figma.com/design/dY6cJ28An8Rmkp2QpPClLr (스마트건설 세이퍼스 - 호반 용인)
+- **토큰 발급:** Figma Settings → Account → Personal access tokens
+- **용도:** extract-icons.py 스크립트로 아이콘 SVG 추출
+- **사용법:** 환경 변수 `FIGMA_ACCESS_TOKEN`으로 설정 후 스크립트 실행
+- **참고:** 실제 토큰은 보안상 문서에 포함하지 않음 (필요시 팀원에게 문의)
 
 ## Figma에서 테스트
 

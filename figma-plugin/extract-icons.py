@@ -1,10 +1,18 @@
 import requests
 import json
+import os
 
 # Figma API settings
 FILE_KEY = "dY6cJ28An8Rmkp2QpPClLr"
 NODE_ID = "221:911"
-ACCESS_TOKEN = "YOUR_FIGMA_ACCESS_TOKEN_HERE"  # Replace with your Figma access token
+
+# Get access token from environment variable
+# Set it before running: export FIGMA_ACCESS_TOKEN="your_token_here"
+ACCESS_TOKEN = os.environ.get("FIGMA_ACCESS_TOKEN")
+if not ACCESS_TOKEN:
+    print("Error: FIGMA_ACCESS_TOKEN environment variable not set")
+    print("Please set it with: export FIGMA_ACCESS_TOKEN='your_token_here'")
+    exit(1)
 
 headers = {
     "X-Figma-Token": ACCESS_TOKEN
