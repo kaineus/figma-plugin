@@ -139,7 +139,12 @@
   </div>
 
   <div class="section">
-    <div class="section-title">3. Components - Basic</div>
+    <div class="section-title">3. Icons</div>
+    <button class="btn btn-secondary" onclick="createIcons()">🎨 Icons 생성</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">4. Components - Basic</div>
     <button class="btn btn-secondary" onclick="createButtons()">🔘 Buttons</button>
     <button class="btn btn-secondary" onclick="createInputs()">📝 Inputs</button>
     <button class="btn btn-secondary" onclick="createCheckboxes()">☑️ Checkboxes</button>
@@ -148,7 +153,7 @@
   </div>
 
   <div class="section">
-    <div class="section-title">4. Components - Display</div>
+    <div class="section-title">5. Components - Display</div>
     <button class="btn btn-secondary" onclick="createCards()">🃏 Cards</button>
     <button class="btn btn-secondary" onclick="createBadges()">🏷️ Badges</button>
     <button class="btn btn-secondary" onclick="createAvatars()">👤 Avatars</button>
@@ -156,7 +161,7 @@
   </div>
 
   <div class="section">
-    <div class="section-title">5. Components - Layout</div>
+    <div class="section-title">6. Components - Layout</div>
     <button class="btn btn-secondary" onclick="createDividers()">➖ Dividers</button>
     <button class="btn btn-secondary" onclick="createSpinners()">⏳ Spinners</button>
     <button class="btn btn-secondary" onclick="createAlerts()">⚠️ Alerts</button>
@@ -202,6 +207,11 @@
       updateStatus('Color Palette 생성 중...');
       const colors = getColors();
       parent.postMessage({ pluginMessage: { type: 'create-colors', colors } }, '*');
+    }
+
+    function createIcons() {
+      updateStatus('Icons 생성 중...');
+      parent.postMessage({ pluginMessage: { type: 'create-icons' } }, '*');
     }
 
     function createButtons() {

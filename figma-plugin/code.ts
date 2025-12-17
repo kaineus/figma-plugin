@@ -1,4 +1,6 @@
 // PF Design System Generator - Figma Plugin
+import { ICONS_DATA } from './icons-data';
+
 figma.showUI(__html__, { width: 320, height: 580 });
 
 function hexToRgb(hex: string): RGB {
@@ -2272,41 +2274,205 @@ Properties:
   sendStatus("Alerts created! (" + components.length + " variants)", "success");
 }
 
+async function createIcons() {
+  sendStatus("Creating icons...");
+
+  // Load fonts
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+
+  const iconsPage = figma.root.findOne(node => node.name === "Icons" && node.type === "PAGE") as PageNode;
+  if (!iconsPage) {
+    sendStatus("Icons page not found! Create pages first.", "error");
+    return;
+  }
+
+  // Clear existing content
+  iconsPage.children.forEach(child => child.remove());
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Icon Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 100;
+  docFrame.y = 100;
+  docFrame.fills = [];
+  iconsPage.appendChild(docFrame);
+
+  // Title section
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Icons";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "System icons for interface elements and actions.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  let totalIconsCreated = 0;
+
+  // Size descriptions
+  const sizeDescriptions: Record<string, string> = {
+    "10px": "Mini icons for compact UI elements and inline usage.",
+    "14px": "Small icons for buttons, inputs, and standard interface elements.",
+    "18px": "Medium icons for emphasis and larger touch targets.",
+    "24px": "Large icons for headers and prominent actions.",
+    "weather": "Weather condition icons for environmental data display."
+  };
+
+  // Process each size category
+  for (const [sizeLabel, icons] of Object.entries(ICONS_DATA)) {
+    const section = figma.createFrame();
+    section.name = `_Property: ${sizeLabel}`;
+    section.layoutMode = "VERTICAL";
+    section.primaryAxisSizingMode = "AUTO";
+    section.counterAxisSizingMode = "AUTO";
+    section.itemSpacing = 16;
+    section.paddingTop = 24;
+    section.paddingBottom = 24;
+    section.paddingLeft = 24;
+    section.paddingRight = 24;
+    section.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+    section.cornerRadius = 12;
+    section.strokes = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.92 } }];
+    section.strokeWeight = 1;
+
+    // Header
+    const header = figma.createFrame();
+    header.name = "Header";
+    header.layoutMode = "VERTICAL";
+    header.primaryAxisSizingMode = "AUTO";
+    header.counterAxisSizingMode = "AUTO";
+    header.itemSpacing = 4;
+    header.fills = [];
+
+    const titleText = figma.createText();
+    titleText.fontName = { family: "Inter", style: "Semi Bold" };
+    titleText.fontSize = 14;
+    titleText.characters = `${sizeLabel} (${icons.length} icons)`;
+    titleText.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
+    header.appendChild(titleText);
+
+    const descText = figma.createText();
+    descText.fontName = { family: "Inter", style: "Regular" };
+    descText.fontSize = 12;
+    descText.characters = sizeDescriptions[sizeLabel] || "";
+    descText.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.55 } }];
+    header.appendChild(descText);
+
+    section.appendChild(header);
+
+    // Icons grid with wrapping
+    const iconsGrid = figma.createFrame();
+    iconsGrid.name = "Content";
+    iconsGrid.layoutMode = "HORIZONTAL";
+    iconsGrid.primaryAxisSizingMode = "FIXED";
+    iconsGrid.counterAxisSizingMode = "AUTO";
+    iconsGrid.resize(1000, 100); // Fixed width for wrapping
+    iconsGrid.itemSpacing = 16;
+    iconsGrid.counterAxisSpacing = 16;
+    iconsGrid.layoutWrap = "WRAP";
+    iconsGrid.fills = [];
+    section.appendChild(iconsGrid);
+
+    // Process icons
+    for (const iconData of icons) {
+      try {
+        // Create icon container (no background)
+        const iconContainer = figma.createFrame();
+        iconContainer.name = iconData.name;
+        iconContainer.fills = [];
+        iconContainer.layoutMode = "VERTICAL";
+        iconContainer.primaryAxisSizingMode = "AUTO";
+        iconContainer.counterAxisSizingMode = "AUTO";
+        iconContainer.itemSpacing = 4;
+        iconContainer.counterAxisAlignItems = "CENTER";
+
+        // Create SVG node from string (no background frame)
+        const svgNode = figma.createNodeFromSvg(iconData.svg);
+        svgNode.name = iconData.name;
+        iconContainer.appendChild(svgNode);
+
+        // Create label
+        const labelText = figma.createText();
+        labelText.fontName = { family: "Inter", style: "Regular" };
+        labelText.fontSize = 9;
+        const cleanName = iconData.name.replace(`${sizeLabel}-`, '').replace('weather-', '');
+        labelText.characters = cleanName.length > 10 ? cleanName.substring(0, 9) + '...' : cleanName;
+        labelText.fills = [{ type: "SOLID", color: { r: 0.45, g: 0.45, b: 0.5 } }];
+        iconContainer.appendChild(labelText);
+
+        iconsGrid.appendChild(iconContainer);
+        totalIconsCreated++;
+      } catch (error) {
+        console.error(`Failed to create icon ${iconData.name}:`, error);
+      }
+    }
+
+    docFrame.appendChild(section);
+  }
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus(`Icons created! (${totalIconsCreated} icons)`, "success");
+}
+
 async function createAll(colors: { primary: string; secondary: string }) {
   try {
-    sendStatus("1/17 Creating pages...");
+    sendStatus("1/18 Creating pages...");
     await createPages();
-    sendStatus("2/17 Creating variables...");
+    sendStatus("2/18 Creating variables...");
     await createVariables(colors);
-    sendStatus("3/17 Creating typography...");
+    sendStatus("3/18 Creating typography...");
     await createTypography();
-    sendStatus("4/17 Creating colors...");
+    sendStatus("4/18 Creating colors...");
     await createColors(colors);
-    sendStatus("5/17 Creating buttons...");
+    sendStatus("5/18 Creating icons...");
+    await createIcons();
+    sendStatus("6/18 Creating buttons...");
     await createButtons(colors);
-    sendStatus("6/17 Creating cards...");
+    sendStatus("7/18 Creating cards...");
     await createCards(colors);
-    sendStatus("7/17 Creating badges...");
+    sendStatus("8/18 Creating badges...");
     await createBadges(colors);
-    sendStatus("8/17 Creating inputs...");
+    sendStatus("9/18 Creating inputs...");
     await createInputs(colors);
-    sendStatus("9/17 Creating checkboxes...");
+    sendStatus("10/18 Creating checkboxes...");
     await createCheckboxes(colors);
-    sendStatus("10/17 Creating radios...");
+    sendStatus("11/18 Creating radios...");
     await createRadios(colors);
-    sendStatus("11/17 Creating toggles...");
+    sendStatus("12/18 Creating toggles...");
     await createToggles(colors);
-    sendStatus("12/17 Creating avatars...");
+    sendStatus("13/18 Creating avatars...");
     await createAvatars(colors);
-    sendStatus("13/17 Creating chips...");
+    sendStatus("14/18 Creating chips...");
     await createChips(colors);
-    sendStatus("14/17 Creating dividers...");
+    sendStatus("15/18 Creating dividers...");
     await createDividers(colors);
-    sendStatus("15/17 Creating spinners...");
+    sendStatus("16/18 Creating spinners...");
     await createSpinners(colors);
-    sendStatus("16/17 Creating alerts...");
+    sendStatus("17/18 Creating alerts...");
     await createAlerts(colors);
-    sendStatus("17/17 Design system complete!", "success");
+    sendStatus("18/18 Design system complete!", "success");
   } catch (error) {
     sendStatus("Error: " + error, "error");
   }
@@ -2319,6 +2485,7 @@ figma.ui.onmessage = async (msg) => {
       case "create-variables": await createVariables(msg.colors); break;
       case "create-typography": await createTypography(); break;
       case "create-colors": await createColors(msg.colors); break;
+      case "create-icons": await createIcons(); break;
       case "create-buttons": await createButtons(msg.colors); break;
       case "create-cards": await createCards(msg.colors); break;
       case "create-badges": await createBadges(msg.colors); break;

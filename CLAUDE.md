@@ -19,7 +19,17 @@ Figma 플러그인으로 디자인 시스템을 자동 생성하는 도구
 - [x] **Typography** - Display, Heading, Body, Caption 문서화
 - [x] **Color Palette** - Primary, Secondary, Success, Warning, Danger, Gray
 
-#### Atom Components (9개 완료)
+#### Icons (82개 완료)
+- [x] **10px Icons** - 7개 (Mini icons for compact UI)
+- [x] **14px Icons** - 44개 (Small icons for interface elements)
+- [x] **18px Icons** - 21개 (Medium icons for emphasis)
+- [x] **24px Icons** - 2개 (Large icons for headers)
+- [x] **Weather Icons** - 8개 (Weather condition icons)
+- [x] SVG 코드 직접 포함 (외부 링크 의존성 없음)
+- [x] Documentation 스타일 레이아웃 적용
+- [x] Python 스크립트로 Figma API에서 자동 추출
+
+#### Atom Components (12개 완료)
 - [x] **Buttons** - Type × State × Size variants, Component Set + Documentation
 - [x] **Cards** - Style (Default, Outlined, Elevated) × Size (SM, MD, LG) + Documentation
 - [x] **Badges** - Type (Primary, Success, Warning, Danger, Gray) × Size + Documentation
@@ -34,13 +44,15 @@ Figma 플러그인으로 디자인 시스템을 자동 생성하는 도구
 - [x] **Alerts** - Type (Info, Success, Warning, Error) + Documentation
 
 #### 페이지 구조
-- [x] 컴포넌트별 독립 페이지 (Buttons, Inputs, Checkboxes, Radios, Toggles, Cards, Badges, Avatars, Chips, Dividers, Spinners, Alerts)
+- [x] 컴포넌트별 독립 페이지 (Icons, Buttons, Inputs, Checkboxes, Radios, Toggles, Cards, Badges, Avatars, Chips, Dividers, Spinners, Alerts)
 - [x] Component Set 숨김 처리 (Documentation만 표시, Library publish 가능)
+- [x] Icons 페이지는 Documentation 스타일로 단일 프레임 구조
 
 #### 인프라
 - [x] GitHub 저장소 연결 및 푸시
 - [x] README 작성
 - [x] figma-design-plugin-fresh를 .gitignore에 추가
+- [x] Python 스크립트로 Figma API 아이콘 추출 자동화 (extract-icons.py)
 
 ### 다음 작업 (TODO)
 

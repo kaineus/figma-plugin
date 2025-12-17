@@ -20,3 +20,8 @@ npm-debug.log*
 
 # Reference projects (not for commit)
 figma-design-plugin-fresh/
+
+# Icon extraction temporary files
+icon-ids*.txt
+icons-source.json
+icons-structure.json

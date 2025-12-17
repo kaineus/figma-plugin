@@ -11,6 +11,17 @@ Figma 플러그인으로 디자인 시스템을 자동 생성합니다.
 - **Typography** - Display, Heading, Body, Caption 스케일
 - **Color Palette** - Primary, Secondary, Success, Warning, Danger, Gray
 
+### Icons
+- **82개 시스템 아이콘** - 5가지 사이즈 카테고리
+  - 10px (7개) - Mini icons for compact UI elements
+  - 14px (44개) - Small icons for buttons and interface elements
+  - 18px (21개) - Medium icons for emphasis
+  - 24px (2개) - Large icons for headers
+  - Weather (8개) - Weather condition icons
+- SVG 포맷으로 코드에 직접 포함 (외부 링크 의존성 없음)
+- Documentation 스타일의 깔끔한 레이아웃
+- 자동 줄바꿈 그리드 형식
+
 ### Components (Atoms)
 - **Buttons** - Type (Primary, Secondary, Outline, Ghost) × State × Size
 - **Inputs** - State (Default, Focus, Disabled) × Size (SM, MD, LG)
@@ -63,10 +74,10 @@ npm run build
 2. Primary/Secondary 색상 선택
 3. 버튼 클릭:
    - **1. Foundations** - 페이지 구조, Variables, Typography, Color Palette 생성
-   - **2. Icons** - 아이콘 생성 (예정)
-   - **3. Components - Basic** - Buttons, Inputs, Checkboxes, Radios, Toggles
-   - **4. Components - Display** - Cards, Badges, Avatars, Chips
-   - **5. Components - Layout** - Dividers, Spinners, Alerts
+   - **3. Icons** - 82개 시스템 아이콘 생성 (10px~24px, Weather)
+   - **4. Components - Basic** - Buttons, Inputs, Checkboxes, Radios, Toggles
+   - **5. Components - Display** - Cards, Badges, Avatars, Chips
+   - **6. Components - Layout** - Dividers, Spinners, Alerts
 4. 또는 **전체 디자인 시스템 생성** 클릭
 
 각 컴포넌트는 Component Set(숨김)과 Documentation Frame으로 구성되며, Library로 publish하면 정상적으로 사용 가능합니다.
@@ -78,6 +89,9 @@ figma-plugin/
 ├── manifest.json      # 플러그인 메타데이터
 ├── code.ts            # 플러그인 메인 코드
 ├── ui.html            # 플러그인 UI
+├── icons-data.json    # 82개 아이콘 SVG 데이터
+├── icons-data.ts      # 아이콘 데이터 TypeScript
+├── extract-icons.py   # Figma API에서 아이콘 추출 스크립트
 ├── package.json
 ├── tsconfig.json
 └── dist/
