@@ -139,10 +139,27 @@
   </div>
 
   <div class="section">
-    <div class="section-title">3. Components</div>
-    <button class="btn btn-secondary" onclick="createButtons()">🔘 Buttons 생성</button>
-    <button class="btn btn-secondary" onclick="createCards()">🃏 Cards 생성</button>
-    <button class="btn btn-secondary" onclick="createBadges()">🏷️ Badges 생성</button>
+    <div class="section-title">3. Components - Basic</div>
+    <button class="btn btn-secondary" onclick="createButtons()">🔘 Buttons</button>
+    <button class="btn btn-secondary" onclick="createInputs()">📝 Inputs</button>
+    <button class="btn btn-secondary" onclick="createCheckboxes()">☑️ Checkboxes</button>
+    <button class="btn btn-secondary" onclick="createRadios()">🔘 Radios</button>
+    <button class="btn btn-secondary" onclick="createToggles()">🔄 Toggles</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">4. Components - Display</div>
+    <button class="btn btn-secondary" onclick="createCards()">🃏 Cards</button>
+    <button class="btn btn-secondary" onclick="createBadges()">🏷️ Badges</button>
+    <button class="btn btn-secondary" onclick="createAvatars()">👤 Avatars</button>
+    <button class="btn btn-secondary" onclick="createChips()">🏷️ Chips</button>
+  </div>
+
+  <div class="section">
+    <div class="section-title">5. Components - Layout</div>
+    <button class="btn btn-secondary" onclick="createDividers()">➖ Dividers</button>
+    <button class="btn btn-secondary" onclick="createSpinners()">⏳ Spinners</button>
+    <button class="btn btn-secondary" onclick="createAlerts()">⚠️ Alerts</button>
   </div>
 
   <div class="divider"></div>
@@ -203,6 +220,60 @@
       updateStatus('Badges 컴포넌트 생성 중...');
       const colors = getColors();
       parent.postMessage({ pluginMessage: { type: 'create-badges', colors } }, '*');
+    }
+
+    function createInputs() {
+      updateStatus('Inputs 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-inputs', colors } }, '*');
+    }
+
+    function createCheckboxes() {
+      updateStatus('Checkboxes 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-checkboxes', colors } }, '*');
+    }
+
+    function createRadios() {
+      updateStatus('Radios 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-radios', colors } }, '*');
+    }
+
+    function createToggles() {
+      updateStatus('Toggles 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-toggles', colors } }, '*');
+    }
+
+    function createAvatars() {
+      updateStatus('Avatars 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-avatars', colors } }, '*');
+    }
+
+    function createChips() {
+      updateStatus('Chips 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-chips', colors } }, '*');
+    }
+
+    function createDividers() {
+      updateStatus('Dividers 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-dividers', colors } }, '*');
+    }
+
+    function createSpinners() {
+      updateStatus('Spinners 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-spinners', colors } }, '*');
+    }
+
+    function createAlerts() {
+      updateStatus('Alerts 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-alerts', colors } }, '*');
     }
 
     function createAll() {

@@ -6,7 +6,7 @@ Figma 플러그인으로 디자인 시스템을 자동 생성하는 도구
 
 **GitHub:** https://github.com/kaineus/figma-plugin
 
-## 현재 상태 (2024-12-15)
+## 현재 상태 (2025-12-17)
 
 ### 완료된 작업
 
@@ -19,29 +19,39 @@ Figma 플러그인으로 디자인 시스템을 자동 생성하는 도구
 - [x] **Typography** - Display, Heading, Body, Caption 문서화
 - [x] **Color Palette** - Primary, Secondary, Success, Warning, Danger, Gray
 
-#### Components
-- [x] **Buttons** - Type × State × Size variants, Component Set
-- [x] **Cards** - Style (Default, Outlined, Elevated) × Size (SM, MD, LG)
-- [x] **Badges** - Type (Primary, Success, Warning, Danger, Gray) × Size
+#### Atom Components (9개 완료)
+- [x] **Buttons** - Type × State × Size variants, Component Set + Documentation
+- [x] **Cards** - Style (Default, Outlined, Elevated) × Size (SM, MD, LG) + Documentation
+- [x] **Badges** - Type (Primary, Success, Warning, Danger, Gray) × Size + Documentation
+- [x] **Inputs** - State (Default, Focus, Disabled) × Size (SM, MD, LG) + Documentation
+- [x] **Checkboxes** - State (Unchecked, Checked, Disabled) × Size (SM, MD, LG) + Documentation
+- [x] **Radios** - State (Unchecked, Checked, Disabled) × Size (SM, MD, LG) + Documentation
+- [x] **Toggles** - State (Off, On, Disabled) × Size (SM, MD, LG) + Documentation
+- [x] **Avatars** - Size variants (XS, SM, MD, LG, XL) + Documentation
+- [x] **Chips** - State (Default, Active, Disabled) × Size (SM, MD, LG) + Documentation
+- [x] **Dividers** - Orientation (Horizontal, Vertical) × Weight (Thin, Medium, Thick) + Documentation
+- [x] **Spinners** - Size variants (XS, SM, MD, LG, XL) + Documentation
+- [x] **Alerts** - Type (Info, Success, Warning, Error) + Documentation
+
+#### 페이지 구조
+- [x] 컴포넌트별 독립 페이지 (Buttons, Inputs, Checkboxes, Radios, Toggles, Cards, Badges, Avatars, Chips, Dividers, Spinners, Alerts)
+- [x] Component Set 숨김 처리 (Documentation만 표시, Library publish 가능)
 
 #### 인프라
 - [x] GitHub 저장소 연결 및 푸시
 - [x] README 작성
+- [x] figma-design-plugin-fresh를 .gitignore에 추가
 
 ### 다음 작업 (TODO)
 
-#### 추가 컴포넌트
-- [ ] Inputs (Text, Password, Search)
-- [ ] Checkbox, Radio, Toggle
+#### 추가 컴포넌트 (Molecules/Organisms)
 - [ ] Select, Dropdown
 - [ ] Modal, Dialog
 - [ ] Toast, Notification
 - [ ] Tabs, Navigation
-
-#### 개선 사항
-- [ ] `bg/brand-subtle`, `bg/tertiary` Variable 추가 (코드에서 참조하지만 미생성)
-- [ ] `createBadges`에 Bold, Regular 폰트 로드 추가
-- [ ] 컴포넌트에 Variable 바인딩 강화
+- [ ] Form 컴포넌트 조합
+- [ ] Navigation Bar
+- [ ] Side Menu
 
 #### MCP 연동 (Phase 2)
 - [ ] MCP Server 구현

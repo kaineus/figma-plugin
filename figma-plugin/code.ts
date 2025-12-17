@@ -60,7 +60,28 @@ async function createAnnotation(text: string, x: number, y: number, parent: Scen
 }
 
 async function createPages() {
-  const pageNames = ["Cover", "---", "Foundations", "Icons", "---", "Components / Buttons", "Components / Inputs", "Components / Cards", "---", "Templates", "Playground"];
+  const pageNames = [
+    "Cover",
+    "---",
+    "Foundations",
+    "Icons",
+    "---",
+    "Buttons",
+    "Inputs",
+    "Checkboxes",
+    "Radios",
+    "Toggles",
+    "Cards",
+    "Badges",
+    "Avatars",
+    "Chips",
+    "Dividers",
+    "Spinners",
+    "Alerts",
+    "---",
+    "Templates",
+    "Playground"
+  ];
   const existingNames = figma.root.children.map(p => p.name);
 
   for (const name of pageNames) {
@@ -675,8 +696,8 @@ async function createButtons(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Inter", style: "Medium" });
   await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
 
-  let buttonsPage = figma.root.children.find(p => p.name === "Components / Buttons") as PageNode | undefined;
-  if (!buttonsPage) { buttonsPage = figma.createPage(); buttonsPage.name = "Components / Buttons"; }
+  let buttonsPage = figma.root.children.find(p => p.name === "Buttons") as PageNode | undefined;
+  if (!buttonsPage) { buttonsPage = figma.createPage(); buttonsPage.name = "Buttons"; }
   buttonsPage.backgrounds = [LIGHT_BG];
   await figma.setCurrentPageAsync(buttonsPage);
 
@@ -792,6 +813,7 @@ async function createButtons(colors: { primary: string; secondary: string }) {
   componentSet.name = "Button";
   componentSet.x = 100;
   componentSet.y = 100;
+  componentSet.visible = false;
 
   // Create documentation frame
   const docFrame = figma.createFrame();
@@ -878,8 +900,8 @@ async function createCards(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Inter", style: "Medium" });
   await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
 
-  let cardsPage = figma.root.children.find(p => p.name === "Components / Cards") as PageNode | undefined;
-  if (!cardsPage) { cardsPage = figma.createPage(); cardsPage.name = "Components / Cards"; }
+  let cardsPage = figma.root.children.find(p => p.name === "Cards") as PageNode | undefined;
+  if (!cardsPage) { cardsPage = figma.createPage(); cardsPage.name = "Cards"; }
   cardsPage.backgrounds = [LIGHT_BG];
   await figma.setCurrentPageAsync(cardsPage);
 
@@ -960,6 +982,7 @@ async function createCards(colors: { primary: string; secondary: string }) {
   componentSet.name = "Card";
   componentSet.x = 100;
   componentSet.y = 100;
+  componentSet.visible = false;
 
   // Documentation
   const docFrame = figma.createFrame();
@@ -1024,8 +1047,8 @@ Properties:
 async function createBadges(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Inter", style: "Medium" });
 
-  let badgesPage = figma.root.children.find(p => p.name === "Components / Badges") as PageNode | undefined;
-  if (!badgesPage) { badgesPage = figma.createPage(); badgesPage.name = "Components / Badges"; }
+  let badgesPage = figma.root.children.find(p => p.name === "Badges") as PageNode | undefined;
+  if (!badgesPage) { badgesPage = figma.createPage(); badgesPage.name = "Badges"; }
   badgesPage.backgrounds = [LIGHT_BG];
   await figma.setCurrentPageAsync(badgesPage);
 
@@ -1085,6 +1108,7 @@ async function createBadges(colors: { primary: string; secondary: string }) {
   componentSet.name = "Badge";
   componentSet.x = 100;
   componentSet.y = 100;
+  componentSet.visible = false;
 
   // Documentation
   const docFrame = figma.createFrame();
@@ -1143,23 +1167,1146 @@ Properties:
   sendStatus("Badges created! (" + components.length + " variants)", "success");
 }
 
+// ═══════════════════════════════════════════════════════════
+// Input Component
+// ═══════════════════════════════════════════════════════════
+async function createInputs(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let inputsPage = figma.root.children.find(p => p.name === "Inputs") as PageNode | undefined;
+  if (!inputsPage) { inputsPage = figma.createPage(); inputsPage.name = "Inputs"; }
+  inputsPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(inputsPage);
+
+  for (const child of [...inputsPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const states = ["Default", "Focus", "Error", "Disabled"];
+  const sizes = [
+    { name: "SM", height: 32, paddingX: 12, fontSize: 12 },
+    { name: "MD", height: 40, paddingX: 16, fontSize: 14 },
+    { name: "LG", height: 48, paddingX: 20, fontSize: 16 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const inputMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const input = figma.createComponent();
+      input.name = `State=${state}, Size=${size.name}`;
+      input.layoutMode = "HORIZONTAL";
+      input.primaryAxisSizingMode = "FIXED";
+      input.counterAxisSizingMode = "FIXED";
+      input.counterAxisAlignItems = "CENTER";
+      input.paddingLeft = size.paddingX;
+      input.paddingRight = size.paddingX;
+      input.resize(280, size.height);
+      input.cornerRadius = 8;
+
+      // Background and border based on state
+      if (state === "Default") {
+        applyVariableToFill(input, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(input, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        input.strokeWeight = 1;
+      } else if (state === "Focus") {
+        applyVariableToFill(input, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(input, "border/brand", primaryRgb);
+        input.strokeWeight = 2;
+      } else if (state === "Error") {
+        applyVariableToFill(input, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(input, "border/danger", { r: 0.86, g: 0.20, b: 0.20 });
+        input.strokeWeight = 2;
+      } else { // Disabled
+        applyVariableToFill(input, "bg/secondary", { r: 0.98, g: 0.98, b: 0.98 });
+        applyVariableToStroke(input, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        input.strokeWeight = 1;
+      }
+
+      // Placeholder text
+      const text = figma.createText();
+      text.fontName = { family: "Inter", style: "Regular" };
+      text.fontSize = size.fontSize;
+      text.characters = state === "Disabled" ? "Disabled" : "Placeholder";
+      applyVariableToFill(text, state === "Disabled" ? "text/disabled" : "text/secondary", { r: 0.64, g: 0.64, b: 0.64 });
+      input.appendChild(text);
+
+      components.push(input);
+      inputMap[`${state}-${size.name}`] = input;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, inputsPage);
+  componentSet.name = "Input";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Input Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 800;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  // Title section
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Input";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Text input fields for user data entry.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  // Property 1: State
+  const stateContent = await createPropertySection(
+    docFrame, "State",
+    "Visual feedback for different interaction states.", 0
+  );
+  for (const state of states) {
+    await createValueItem(stateContent, state, inputMap[`${state}-MD`]);
+  }
+
+  // Property 2: Size
+  const sizeContent = await createPropertySection(
+    docFrame, "Size",
+    "Size variants for different contexts and layouts.", 0
+  );
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, inputMap[`Default-${size.name}`]);
+  }
+
+  componentSet.description = `Input Component
+
+Text input fields for user data entry.
+
+Properties:
+• State: Default, Focus, Error, Disabled
+• Size: SM (32px), MD (40px), LG (48px)`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Inputs created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Checkbox Component
+// ═══════════════════════════════════════════════════════════
+async function createCheckboxes(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let checkboxPage = figma.root.children.find(p => p.name === "Checkboxes") as PageNode | undefined;
+  if (!checkboxPage) { checkboxPage = figma.createPage(); checkboxPage.name = "Checkboxes"; }
+  checkboxPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(checkboxPage);
+
+  for (const child of [...checkboxPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const states = ["Unchecked", "Checked", "Disabled"];
+  const sizes = [
+    { name: "SM", size: 16 },
+    { name: "MD", size: 20 },
+    { name: "LG", size: 24 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const checkboxMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const checkbox = figma.createComponent();
+      checkbox.name = `State=${state}, Size=${size.name}`;
+      checkbox.resize(size.size, size.size);
+      checkbox.cornerRadius = 4;
+
+      if (state === "Checked") {
+        applyVariableToFill(checkbox, "interactive/primary", primaryRgb);
+
+        // Create checkmark using vector with 70% size
+        const check = figma.createVector();
+        const s = size.size;
+        const checkSize = s * 0.7;
+
+        // Define checkmark path relative to 70% size
+        check.vectorPaths = [{
+          windingRule: "NONZERO",
+          data: `M ${checkSize * 0.2} ${checkSize * 0.5} L ${checkSize * 0.45} ${checkSize * 0.8} L ${checkSize * 0.8} ${checkSize * 0.2}`
+        }];
+
+        check.strokes = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+        check.strokeWeight = size.size <= 16 ? 1.5 : 2;
+        check.strokeCap = "ROUND";
+        check.strokeJoin = "ROUND";
+        check.resize(checkSize, checkSize);
+        // Center the checkmark in the box
+        check.x = (s - checkSize) / 2;
+        check.y = (s - checkSize) / 2;
+        checkbox.appendChild(check);
+      } else if (state === "Disabled") {
+        applyVariableToFill(checkbox, "bg/secondary", { r: 0.96, g: 0.96, b: 0.96 });
+        applyVariableToStroke(checkbox, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        checkbox.strokeWeight = 1;
+      } else { // Unchecked
+        applyVariableToFill(checkbox, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(checkbox, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        checkbox.strokeWeight = 1;
+      }
+
+      components.push(checkbox);
+      checkboxMap[`${state}-${size.name}`] = checkbox;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, checkboxPage);
+  componentSet.name = "Checkbox";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Checkbox Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 600;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Checkbox";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Checkboxes allow users to select one or more items from a set.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const stateContent = await createPropertySection(docFrame, "State", "Selection states for the checkbox.", 0);
+  for (const state of states) {
+    await createValueItem(stateContent, state, checkboxMap[`${state}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, checkboxMap[`Unchecked-${size.name}`]);
+  }
+
+  componentSet.description = `Checkbox Component
+
+Checkboxes allow users to select one or more items from a set.
+
+Properties:
+• State: Unchecked, Checked, Disabled
+• Size: SM (16px), MD (20px), LG (24px)`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Checkboxes created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Radio Component
+// ═══════════════════════════════════════════════════════════
+async function createRadios(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let radioPage = figma.root.children.find(p => p.name === "Radios") as PageNode | undefined;
+  if (!radioPage) { radioPage = figma.createPage(); radioPage.name = "Radios"; }
+  radioPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(radioPage);
+
+  for (const child of [...radioPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const states = ["Unselected", "Selected", "Disabled"];
+  const sizes = [
+    { name: "SM", size: 16, dotSize: 8 },
+    { name: "MD", size: 20, dotSize: 10 },
+    { name: "LG", size: 24, dotSize: 12 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const radioMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const radio = figma.createComponent();
+      radio.name = `State=${state}, Size=${size.name}`;
+      radio.resize(size.size, size.size);
+      radio.cornerRadius = size.size / 2; // Circle
+
+      if (state === "Selected") {
+        applyVariableToFill(radio, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(radio, "interactive/primary", primaryRgb);
+        radio.strokeWeight = 2;
+
+        // Inner dot
+        const dot = figma.createEllipse();
+        dot.resize(size.dotSize, size.dotSize);
+        dot.x = (size.size - size.dotSize) / 2;
+        dot.y = (size.size - size.dotSize) / 2;
+        applyVariableToFill(dot, "interactive/primary", primaryRgb);
+        radio.appendChild(dot);
+      } else if (state === "Disabled") {
+        applyVariableToFill(radio, "bg/secondary", { r: 0.96, g: 0.96, b: 0.96 });
+        applyVariableToStroke(radio, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        radio.strokeWeight = 1;
+      } else { // Unselected
+        applyVariableToFill(radio, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(radio, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        radio.strokeWeight = 1;
+      }
+
+      components.push(radio);
+      radioMap[`${state}-${size.name}`] = radio;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, radioPage);
+  componentSet.name = "Radio";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Radio Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 600;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Radio";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Radio buttons allow users to select one option from a set.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const stateContent = await createPropertySection(docFrame, "State", "Selection states for the radio button.", 0);
+  for (const state of states) {
+    await createValueItem(stateContent, state, radioMap[`${state}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, radioMap[`Unselected-${size.name}`]);
+  }
+
+  componentSet.description = `Radio Component
+
+Radio buttons allow users to select one option from a set.
+
+Properties:
+• State: Unselected, Selected, Disabled
+• Size: SM (16px), MD (20px), LG (24px)`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Radios created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Toggle Component
+// ═══════════════════════════════════════════════════════════
+async function createToggles(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let togglePage = figma.root.children.find(p => p.name === "Toggles") as PageNode | undefined;
+  if (!togglePage) { togglePage = figma.createPage(); togglePage.name = "Toggles"; }
+  togglePage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(togglePage);
+
+  for (const child of [...togglePage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const states = ["Off", "On", "Disabled"];
+  const sizes = [
+    { name: "SM", width: 36, height: 20, knobSize: 16, knobPadding: 2 },
+    { name: "MD", width: 44, height: 24, knobSize: 20, knobPadding: 2 },
+    { name: "LG", width: 52, height: 28, knobSize: 24, knobPadding: 2 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const toggleMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const toggle = figma.createComponent();
+      toggle.name = `State=${state}, Size=${size.name}`;
+      toggle.resize(size.width, size.height);
+      toggle.cornerRadius = size.height / 2;
+
+      if (state === "On") {
+        applyVariableToFill(toggle, "interactive/primary", primaryRgb);
+      } else if (state === "Disabled") {
+        applyVariableToFill(toggle, "bg/secondary", { r: 0.9, g: 0.9, b: 0.9 });
+      } else { // Off
+        applyVariableToFill(toggle, "interactive/secondary", { r: 0.83, g: 0.83, b: 0.83 });
+      }
+
+      // Knob
+      const knob = figma.createEllipse();
+      knob.resize(size.knobSize, size.knobSize);
+      knob.x = state === "On" ? size.width - size.knobSize - size.knobPadding : size.knobPadding;
+      knob.y = size.knobPadding;
+      knob.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      toggle.appendChild(knob);
+
+      components.push(toggle);
+      toggleMap[`${state}-${size.name}`] = toggle;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, togglePage);
+  componentSet.name = "Toggle";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Toggle Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 700;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Toggle";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Toggles allow users to switch between two states.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const stateContent = await createPropertySection(docFrame, "State", "Toggle states for on/off interactions.", 0);
+  for (const state of states) {
+    await createValueItem(stateContent, state, toggleMap[`${state}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, toggleMap[`Off-${size.name}`]);
+  }
+
+  componentSet.description = `Toggle Component
+
+Toggles allow users to switch between two states.
+
+Properties:
+• State: Off, On, Disabled
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Toggles created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Avatar Component
+// ═══════════════════════════════════════════════════════════
+async function createAvatars(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let avatarPage = figma.root.children.find(p => p.name === "Avatars") as PageNode | undefined;
+  if (!avatarPage) { avatarPage = figma.createPage(); avatarPage.name = "Avatars"; }
+  avatarPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(avatarPage);
+
+  for (const child of [...avatarPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const sizes = [
+    { name: "XS", size: 24, fontSize: 10 },
+    { name: "SM", size: 32, fontSize: 12 },
+    { name: "MD", size: 40, fontSize: 14 },
+    { name: "LG", size: 48, fontSize: 16 },
+    { name: "XL", size: 64, fontSize: 20 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const avatarMap: Record<string, ComponentNode> = {};
+
+  for (const size of sizes) {
+    const avatar = figma.createComponent();
+    avatar.name = `Size=${size.name}`;
+    avatar.resize(size.size, size.size);
+    avatar.cornerRadius = size.size / 2; // Circle
+    applyVariableToFill(avatar, "bg/brand", lighten(primaryRgb, 0.85));
+
+    // Initials
+    const text = figma.createText();
+    text.fontName = { family: "Inter", style: "Semi Bold" };
+    text.fontSize = size.fontSize;
+    text.characters = "AB";
+    text.textAlignHorizontal = "CENTER";
+    text.textAlignVertical = "CENTER";
+    text.resize(size.size, size.size);
+    applyVariableToFill(text, "text/brand", primaryRgb);
+    avatar.appendChild(text);
+
+    components.push(avatar);
+    avatarMap[size.name] = avatar;
+  }
+
+  const componentSet = figma.combineAsVariants(components, avatarPage);
+  componentSet.name = "Avatar";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Avatar Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 600;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Avatar";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Avatars represent users or entities.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, avatarMap[size.name]);
+  }
+
+  componentSet.description = `Avatar Component
+
+Avatars represent users or entities.
+
+Properties:
+• Size: XS (24px), SM (32px), MD (40px), LG (48px), XL (64px)`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Avatars created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Chip Component
+// ═══════════════════════════════════════════════════════════
+async function createChips(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let chipPage = figma.root.children.find(p => p.name === "Chips") as PageNode | undefined;
+  if (!chipPage) { chipPage = figma.createPage(); chipPage.name = "Chips"; }
+  chipPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(chipPage);
+
+  for (const child of [...chipPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const states = ["Default", "Selected"];
+  const sizes = [
+    { name: "SM", height: 24, paddingX: 10, fontSize: 11 },
+    { name: "MD", height: 28, paddingX: 12, fontSize: 12 },
+    { name: "LG", height: 32, paddingX: 14, fontSize: 13 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const chipMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const chip = figma.createComponent();
+      chip.name = `State=${state}, Size=${size.name}`;
+      chip.layoutMode = "HORIZONTAL";
+      chip.primaryAxisSizingMode = "AUTO";
+      chip.counterAxisSizingMode = "FIXED";
+      chip.counterAxisAlignItems = "CENTER";
+      chip.primaryAxisAlignItems = "CENTER";
+      chip.paddingLeft = size.paddingX;
+      chip.paddingRight = size.paddingX;
+      chip.resize(80, size.height);
+      chip.cornerRadius = size.height / 2;
+
+      if (state === "Selected") {
+        applyVariableToFill(chip, "bg/brand-solid", primaryRgb);
+      } else {
+        applyVariableToFill(chip, "bg/secondary", { r: 0.95, g: 0.95, b: 0.95 });
+      }
+
+      const text = figma.createText();
+      text.fontName = { family: "Inter", style: "Medium" };
+      text.fontSize = size.fontSize;
+      text.characters = "Chip";
+      applyVariableToFill(text, state === "Selected" ? "text/on-color" : "text/secondary", state === "Selected" ? { r: 1, g: 1, b: 1 } : { r: 0.4, g: 0.4, b: 0.4 });
+      chip.appendChild(text);
+
+      components.push(chip);
+      chipMap[`${state}-${size.name}`] = chip;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, chipPage);
+  componentSet.name = "Chip";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Chip Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 600;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Chip";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Chips represent small blocks of information or selections.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const stateContent = await createPropertySection(docFrame, "State", "Selection states for chips.", 0);
+  for (const state of states) {
+    await createValueItem(stateContent, state, chipMap[`${state}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, chipMap[`Default-${size.name}`]);
+  }
+
+  componentSet.description = `Chip Component
+
+Chips represent small blocks of information or selections.
+
+Properties:
+• State: Default, Selected
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Chips created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Divider Component
+// ═══════════════════════════════════════════════════════════
+async function createDividers(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let dividerPage = figma.root.children.find(p => p.name === "Dividers") as PageNode | undefined;
+  if (!dividerPage) { dividerPage = figma.createPage(); dividerPage.name = "Dividers"; }
+  dividerPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(dividerPage);
+
+  for (const child of [...dividerPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const orientations = ["Horizontal", "Vertical"];
+  const weights = [
+    { name: "Thin", weight: 1 },
+    { name: "Medium", weight: 2 },
+    { name: "Thick", weight: 4 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const dividerMap: Record<string, ComponentNode> = {};
+
+  for (const orientation of orientations) {
+    for (const weight of weights) {
+      const divider = figma.createComponent();
+      divider.name = `Orientation=${orientation}, Weight=${weight.name}`;
+
+      if (orientation === "Horizontal") {
+        divider.resize(200, weight.weight);
+      } else {
+        divider.resize(weight.weight, 100);
+      }
+
+      applyVariableToFill(divider, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+
+      components.push(divider);
+      dividerMap[`${orientation}-${weight.name}`] = divider;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, dividerPage);
+  componentSet.name = "Divider";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Divider Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 500;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Divider";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Dividers separate content into clear groups.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const orientationContent = await createPropertySection(docFrame, "Orientation", "Horizontal or vertical dividers.", 0);
+  for (const orientation of orientations) {
+    await createValueItem(orientationContent, orientation, dividerMap[`${orientation}-Medium`]);
+  }
+
+  const weightContent = await createPropertySection(docFrame, "Weight", "Thickness variants for emphasis.", 0);
+  for (const weight of weights) {
+    await createValueItem(weightContent, weight.name, dividerMap[`Horizontal-${weight.name}`]);
+  }
+
+  componentSet.description = `Divider Component
+
+Dividers separate content into clear groups.
+
+Properties:
+• Orientation: Horizontal, Vertical
+• Weight: Thin (1px), Medium (2px), Thick (4px)`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Dividers created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Spinner Component
+// ═══════════════════════════════════════════════════════════
+async function createSpinners(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let spinnerPage = figma.root.children.find(p => p.name === "Spinners") as PageNode | undefined;
+  if (!spinnerPage) { spinnerPage = figma.createPage(); spinnerPage.name = "Spinners"; }
+  spinnerPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(spinnerPage);
+
+  for (const child of [...spinnerPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const sizes = [
+    { name: "SM", size: 16, strokeWidth: 2 },
+    { name: "MD", size: 24, strokeWidth: 3 },
+    { name: "LG", size: 32, strokeWidth: 4 },
+    { name: "XL", size: 48, strokeWidth: 5 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const spinnerMap: Record<string, ComponentNode> = {};
+
+  for (const size of sizes) {
+    const spinner = figma.createComponent();
+    spinner.name = `Size=${size.name}`;
+    spinner.resize(size.size, size.size);
+
+    // Create circular arc for spinner
+    const arc = figma.createEllipse();
+    arc.resize(size.size, size.size);
+    arc.x = 0;
+    arc.y = 0;
+    arc.fills = [];
+    arc.strokeWeight = size.strokeWidth;
+    arc.strokeCap = "ROUND";
+    applyVariableToStroke(arc, "interactive/primary", primaryRgb);
+    arc.arcData = { startingAngle: 0, endingAngle: 4.71239, innerRadius: 0.7 }; // 270 degrees
+    spinner.appendChild(arc);
+
+    components.push(spinner);
+    spinnerMap[size.name] = spinner;
+  }
+
+  const componentSet = figma.combineAsVariants(components, spinnerPage);
+  componentSet.name = "Spinner";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Spinner Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 500;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Spinner";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Spinners indicate loading or processing states.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, spinnerMap[size.name]);
+  }
+
+  componentSet.description = `Spinner Component
+
+Spinners indicate loading or processing states.
+
+Properties:
+• Size: SM (16px), MD (24px), LG (32px), XL (48px)`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Spinners created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Alert Component
+// ═══════════════════════════════════════════════════════════
+async function createAlerts(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let alertPage = figma.root.children.find(p => p.name === "Alerts") as PageNode | undefined;
+  if (!alertPage) { alertPage = figma.createPage(); alertPage.name = "Alerts"; }
+  alertPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(alertPage);
+
+  for (const child of [...alertPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const types = [
+    { name: "Info", bgVar: "bg/brand", textVar: "text/brand", borderVar: "border/brand", bgFallback: lighten(primaryRgb, 0.9), textFallback: primaryRgb, borderFallback: primaryRgb },
+    { name: "Success", bgVar: "bg/success", textVar: "text/success", borderVar: "border/success", bgFallback: { r: 0.9, g: 0.95, b: 0.9 }, textFallback: { r: 0.13, g: 0.55, b: 0.13 }, borderFallback: { r: 0.13, g: 0.55, b: 0.13 } },
+    { name: "Warning", bgVar: "bg/warning", textVar: "text/warning", borderVar: "border/warning", bgFallback: { r: 1, g: 0.95, b: 0.85 }, textFallback: { r: 0.7, g: 0.5, b: 0.05 }, borderFallback: { r: 0.95, g: 0.65, b: 0.05 } },
+    { name: "Danger", bgVar: "bg/danger", textVar: "text/danger", borderVar: "border/danger", bgFallback: { r: 1, g: 0.9, b: 0.9 }, textFallback: { r: 0.7, g: 0.15, b: 0.15 }, borderFallback: { r: 0.86, g: 0.20, b: 0.20 } },
+  ];
+
+  const components: ComponentNode[] = [];
+  const alertMap: Record<string, ComponentNode> = {};
+
+  for (const type of types) {
+    const alert = figma.createComponent();
+    alert.name = `Type=${type.name}`;
+    alert.layoutMode = "VERTICAL";
+    alert.primaryAxisSizingMode = "AUTO";
+    alert.counterAxisSizingMode = "FIXED";
+    alert.resize(400, 100);
+    alert.paddingTop = 16;
+    alert.paddingBottom = 16;
+    alert.paddingLeft = 16;
+    alert.paddingRight = 16;
+    alert.itemSpacing = 8;
+    alert.cornerRadius = 8;
+
+    applyVariableToFill(alert, type.bgVar, type.bgFallback);
+    applyVariableToStroke(alert, type.borderVar, type.borderFallback);
+    alert.strokeWeight = 1;
+
+    // Title
+    const title = figma.createText();
+    title.fontName = { family: "Inter", style: "Semi Bold" };
+    title.fontSize = 14;
+    title.characters = type.name;
+    applyVariableToFill(title, type.textVar, type.textFallback);
+    alert.appendChild(title);
+
+    // Message
+    const message = figma.createText();
+    message.fontName = { family: "Inter", style: "Regular" };
+    message.fontSize = 13;
+    message.characters = "This is an alert message.";
+    message.resize(368, message.height);
+    message.textAutoResize = "HEIGHT";
+    applyVariableToFill(message, type.textVar, type.textFallback);
+    alert.appendChild(message);
+
+    components.push(alert);
+    alertMap[type.name] = alert;
+  }
+
+  const componentSet = figma.combineAsVariants(components, alertPage);
+  componentSet.name = "Alert";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Alert Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 600;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Alert";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Alerts display important messages to users.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const typeContent = await createPropertySection(docFrame, "Type", "Alert types for different message severities.", 0);
+  for (const type of types) {
+    await createValueItem(typeContent, type.name, alertMap[type.name]);
+  }
+
+  componentSet.description = `Alert Component
+
+Alerts display important messages to users.
+
+Properties:
+• Type: Info, Success, Warning, Danger`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Alerts created! (" + components.length + " variants)", "success");
+}
+
 async function createAll(colors: { primary: string; secondary: string }) {
   try {
-    sendStatus("1/7 Creating pages...");
+    sendStatus("1/17 Creating pages...");
     await createPages();
-    sendStatus("2/7 Creating variables...");
+    sendStatus("2/17 Creating variables...");
     await createVariables(colors);
-    sendStatus("3/7 Creating typography...");
+    sendStatus("3/17 Creating typography...");
     await createTypography();
-    sendStatus("4/7 Creating colors...");
+    sendStatus("4/17 Creating colors...");
     await createColors(colors);
-    sendStatus("5/7 Creating buttons...");
+    sendStatus("5/17 Creating buttons...");
     await createButtons(colors);
-    sendStatus("6/7 Creating cards...");
+    sendStatus("6/17 Creating cards...");
     await createCards(colors);
-    sendStatus("7/7 Creating badges...");
+    sendStatus("7/17 Creating badges...");
     await createBadges(colors);
-    sendStatus("Design system complete!", "success");
+    sendStatus("8/17 Creating inputs...");
+    await createInputs(colors);
+    sendStatus("9/17 Creating checkboxes...");
+    await createCheckboxes(colors);
+    sendStatus("10/17 Creating radios...");
+    await createRadios(colors);
+    sendStatus("11/17 Creating toggles...");
+    await createToggles(colors);
+    sendStatus("12/17 Creating avatars...");
+    await createAvatars(colors);
+    sendStatus("13/17 Creating chips...");
+    await createChips(colors);
+    sendStatus("14/17 Creating dividers...");
+    await createDividers(colors);
+    sendStatus("15/17 Creating spinners...");
+    await createSpinners(colors);
+    sendStatus("16/17 Creating alerts...");
+    await createAlerts(colors);
+    sendStatus("17/17 Design system complete!", "success");
   } catch (error) {
     sendStatus("Error: " + error, "error");
   }
@@ -1175,6 +2322,15 @@ figma.ui.onmessage = async (msg) => {
       case "create-buttons": await createButtons(msg.colors); break;
       case "create-cards": await createCards(msg.colors); break;
       case "create-badges": await createBadges(msg.colors); break;
+      case "create-inputs": await createInputs(msg.colors); break;
+      case "create-checkboxes": await createCheckboxes(msg.colors); break;
+      case "create-radios": await createRadios(msg.colors); break;
+      case "create-toggles": await createToggles(msg.colors); break;
+      case "create-avatars": await createAvatars(msg.colors); break;
+      case "create-chips": await createChips(msg.colors); break;
+      case "create-dividers": await createDividers(msg.colors); break;
+      case "create-spinners": await createSpinners(msg.colors); break;
+      case "create-alerts": await createAlerts(msg.colors); break;
       case "create-all": await createAll(msg.colors); break;
     }
   } catch (error) {
