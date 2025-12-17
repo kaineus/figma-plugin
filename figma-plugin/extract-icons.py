@@ -1,17 +1,27 @@
 import requests
 import json
 import os
+from pathlib import Path
+
+# Load environment variables from .env file
+try:
+    from dotenv import load_dotenv
+    env_path = Path(__file__).parent / '.env'
+    load_dotenv(env_path)
+except ImportError:
+    print("Warning: python-dotenv not installed. Falling back to environment variables.")
+    print("Install with: pip install python-dotenv")
 
 # Figma API settings
 FILE_KEY = "dY6cJ28An8Rmkp2QpPClLr"
 NODE_ID = "221:911"
 
-# Get access token from environment variable
-# Set it before running: export FIGMA_ACCESS_TOKEN="your_token_here"
+# Get access token from environment variable or .env file
 ACCESS_TOKEN = os.environ.get("FIGMA_ACCESS_TOKEN")
 if not ACCESS_TOKEN:
-    print("Error: FIGMA_ACCESS_TOKEN environment variable not set")
-    print("Please set it with: export FIGMA_ACCESS_TOKEN='your_token_here'")
+    print("Error: FIGMA_ACCESS_TOKEN not found")
+    print("Please create a .env file with: FIGMA_ACCESS_TOKEN='your_token_here'")
+    print("Or set environment variable: export FIGMA_ACCESS_TOKEN='your_token_here'")
     exit(1)
 
 headers = {

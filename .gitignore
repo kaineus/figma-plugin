@@ -25,3 +25,6 @@ figma-design-plugin-fresh/
 icon-ids*.txt
 icons-source.json
 icons-structure.json
+
+# Environment variables
+.env

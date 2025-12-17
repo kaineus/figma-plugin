@@ -140,7 +140,12 @@ cd figma-plugin && npm run build
 cd figma-plugin && npm run watch
 
 # 아이콘 추출 (Figma API에서 SVG 가져오기)
-export FIGMA_ACCESS_TOKEN="your_figma_token_here"
+# 1. .env 파일 생성 (처음 한 번만)
+cp figma-plugin/.env.example figma-plugin/.env
+# 2. .env 파일에 실제 토큰 입력
+# 3. python-dotenv 설치 (선택사항)
+pip install python-dotenv
+# 4. 아이콘 추출 실행
 cd figma-plugin && python extract-icons.py
 
 # Git 커밋 (Conventional Commits)
@@ -149,12 +154,30 @@ git commit -m "fix: description"
 git commit -m "docs: description"
 ```
 
-### Figma Access Token
-- **소스 파일:** https://www.figma.com/design/dY6cJ28An8Rmkp2QpPClLr (스마트건설 세이퍼스 - 호반 용인)
-- **토큰 발급:** Figma Settings → Account → Personal access tokens
-- **용도:** extract-icons.py 스크립트로 아이콘 SVG 추출
-- **사용법:** 환경 변수 `FIGMA_ACCESS_TOKEN`으로 설정 후 스크립트 실행
-- **참고:** 실제 토큰은 보안상 문서에 포함하지 않음 (필요시 팀원에게 문의)
+### Figma Access Token 설정
+
+**소스 파일:** https://www.figma.com/design/dY6cJ28An8Rmkp2QpPClLr (스마트건설 세이퍼스 - 호반 용인)
+
+**설정 방법:**
+1. `.env.example`을 복사하여 `.env` 파일 생성
+   ```bash
+   cp figma-plugin/.env.example figma-plugin/.env
+   ```
+2. `.env` 파일에 실제 Figma Access Token 입력
+   ```
+   FIGMA_ACCESS_TOKEN=your_actual_token_here
+   ```
+3. (선택사항) python-dotenv 설치
+   ```bash
+   pip install python-dotenv
+   ```
+
+**토큰 발급:** Figma Settings → Account → Personal access tokens
+
+**참고:**
+- `.env` 파일은 `.gitignore`에 포함되어 Git에 커밋되지 않음
+- `.env.example`은 템플릿 파일로 Git에 포함됨
+- python-dotenv가 없어도 환경 변수로 동작 가능
 
 ## Figma에서 테스트
 
