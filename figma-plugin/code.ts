@@ -351,7 +351,7 @@ async function createVariables(colors: { primary: string; secondary: string }) {
 async function createTypography() {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let foundationsPage = figma.root.children.find(p => p.name === "Foundations") as PageNode | undefined;
@@ -609,7 +609,7 @@ async function createPropertySection(
   header.fills = [];
 
   const titleText = figma.createText();
-  titleText.fontName = { family: "Pretendard", style: "Semi Bold" };
+  titleText.fontName = { family: "Pretendard", style: "SemiBold" };
   titleText.fontSize = 14;
   titleText.characters = title;
   titleText.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
@@ -704,7 +704,7 @@ function applyVariableToStroke(node: SceneNode & MinimalStrokesMixin, variableNa
 async function createButtons(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
 
   let buttonsPage = figma.root.children.find(p => p.name === "Buttons") as PageNode | undefined;
   if (!buttonsPage) { buttonsPage = figma.createPage(); buttonsPage.name = "Buttons"; }
@@ -806,7 +806,7 @@ async function createButtons(colors: { primary: string; secondary: string }) {
 
         // Create text with variable binding
         const text = figma.createText();
-        text.fontName = { family: "Pretendard", style: "Semi Bold" };
+        text.fontName = { family: "Pretendard", style: "SemiBold" };
         text.fontSize = size.fontSize;
         text.characters = "Button";
         applyVariableToFill(text, mapping.textVar, mapping.textFallback);
@@ -910,7 +910,7 @@ Properties:
 async function createCards(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
 
   let cardsPage = figma.root.children.find(p => p.name === "Cards") as PageNode | undefined;
   if (!cardsPage) { cardsPage = figma.createPage(); cardsPage.name = "Cards"; }
@@ -968,7 +968,7 @@ async function createCards(colors: { primary: string; secondary: string }) {
 
       // Card Header
       const header = figma.createText();
-      header.fontName = { family: "Pretendard", style: "Semi Bold" };
+      header.fontName = { family: "Pretendard", style: "SemiBold" };
       header.fontSize = size.name === "SM" ? 14 : size.name === "MD" ? 16 : 18;
       header.characters = "Card Title";
       applyVariableToFill(header, "text/primary", { r: 0.07, g: 0.07, b: 0.07 });
@@ -1189,7 +1189,7 @@ Properties:
 async function createInputs(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let inputsPage = figma.root.children.find(p => p.name === "Inputs") as PageNode | undefined;
@@ -1337,7 +1337,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createCheckboxes(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let checkboxPage = figma.root.children.find(p => p.name === "Checkboxes") as PageNode | undefined;
@@ -1476,7 +1476,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createRadios(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let radioPage = figma.root.children.find(p => p.name === "Radios") as PageNode | undefined;
@@ -1604,7 +1604,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createSwitches(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let switchPage = figma.root.children.find(p => p.name === "Switches") as PageNode | undefined;
@@ -1726,7 +1726,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createAvatars(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let avatarPage = figma.root.children.find(p => p.name === "Avatars") as PageNode | undefined;
@@ -1760,7 +1760,7 @@ async function createAvatars(colors: { primary: string; secondary: string }) {
 
     // Initials
     const text = figma.createText();
-    text.fontName = { family: "Pretendard", style: "Semi Bold" };
+    text.fontName = { family: "Pretendard", style: "SemiBold" };
     text.fontSize = size.fontSize;
     text.characters = "AB";
     text.textAlignHorizontal = "CENTER";
@@ -1838,7 +1838,7 @@ Properties:
 async function createLabels(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let labelPage = figma.root.children.find(p => p.name === "Labels") as PageNode | undefined;
@@ -1969,7 +1969,7 @@ Properties:
 async function createLinks(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let linkPage = figma.root.children.find(p => p.name === "Links") as PageNode | undefined;
@@ -2093,7 +2093,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createTextareas(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let textareaPage = figma.root.children.find(p => p.name === "Textareas") as PageNode | undefined;
@@ -2234,7 +2234,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createProgressBars(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let progressPage = figma.root.children.find(p => p.name === "Progress") as PageNode | undefined;
@@ -2352,7 +2352,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createSkeletons(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let skeletonPage = figma.root.children.find(p => p.name === "Skeletons") as PageNode | undefined;
@@ -2466,7 +2466,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createSliders(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let sliderPage = figma.root.children.find(p => p.name === "Sliders") as PageNode | undefined;
@@ -2603,7 +2603,7 @@ Properties:
 async function createToggles(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let togglePage = figma.root.children.find(p => p.name === "Toggles") as PageNode | undefined;
@@ -2747,7 +2747,7 @@ Properties:
 async function createChips(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let chipPage = figma.root.children.find(p => p.name === "Chips") as PageNode | undefined;
@@ -2873,7 +2873,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createSeparators(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let separatorPage = figma.root.children.find(p => p.name === "Separators") as PageNode | undefined;
@@ -2983,7 +2983,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createSpinners(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let spinnerPage = figma.root.children.find(p => p.name === "Spinners") as PageNode | undefined;
@@ -3092,7 +3092,7 @@ Properties:
 // ═══════════════════════════════════════════════════════════
 async function createAlerts(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let alertPage = figma.root.children.find(p => p.name === "Alerts") as PageNode | undefined;
@@ -3136,7 +3136,7 @@ async function createAlerts(colors: { primary: string; secondary: string }) {
 
     // Title
     const title = figma.createText();
-    title.fontName = { family: "Pretendard", style: "Semi Bold" };
+    title.fontName = { family: "Pretendard", style: "SemiBold" };
     title.fontSize = 14;
     title.characters = type.name;
     applyVariableToFill(title, type.textVar, type.textFallback);
@@ -3221,7 +3221,7 @@ async function createIcons() {
   // Load fonts
   await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
-  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
   await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
 
   const iconsPage = figma.root.findOne(node => node.name === "Icons" && node.type === "PAGE") as PageNode;
@@ -3310,7 +3310,7 @@ async function createIcons() {
     header.fills = [];
 
     const titleText = figma.createText();
-    titleText.fontName = { family: "Pretendard", style: "Semi Bold" };
+    titleText.fontName = { family: "Pretendard", style: "SemiBold" };
     titleText.fontSize = 14;
     titleText.characters = `${sizeLabel} (${icons.length} icons)`;
     titleText.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
