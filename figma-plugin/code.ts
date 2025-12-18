@@ -2608,7 +2608,10 @@ async function createToggles(colors: { primary: string; secondary: string }) {
       toggle.counterAxisSizingMode = "FIXED";
       toggle.resize(200, size.height);
       toggle.itemSpacing = 0;
-      toggle.padding = size.padding;
+      toggle.paddingLeft = size.padding;
+      toggle.paddingRight = size.padding;
+      toggle.paddingTop = size.padding;
+      toggle.paddingBottom = size.padding;
       toggle.cornerRadius = 8;
       applyVariableToFill(toggle, "bg/secondary", { r: 0.95, g: 0.95, b: 0.95 });
 
