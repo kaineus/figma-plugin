@@ -373,8 +373,8 @@ async function createTypography() {
   const titles = [
     { name: "Title / XL", size: 48, weight: "Bold", lineHeight: 56 },
     { name: "Title / LG", size: 40, weight: "Bold", lineHeight: 48 },
-    { name: "Title / MD", size: 32, weight: "Semi Bold", lineHeight: 40 },
-    { name: "Title / SM", size: 24, weight: "Semi Bold", lineHeight: 32 },
+    { name: "Title / MD", size: 32, weight: "SemiBold", lineHeight: 40 },
+    { name: "Title / SM", size: 24, weight: "SemiBold", lineHeight: 32 },
   ];
 
   let yOffset = 50;
@@ -402,8 +402,8 @@ async function createTypography() {
   section.appendChild(headingSection);
 
   const headings = [
-    { name: "Heading / H1", size: 28, weight: "Semi Bold", lineHeight: 36 },
-    { name: "Heading / H2", size: 24, weight: "Semi Bold", lineHeight: 32 },
+    { name: "Heading / H1", size: 28, weight: "SemiBold", lineHeight: 36 },
+    { name: "Heading / H2", size: 24, weight: "SemiBold", lineHeight: 32 },
     { name: "Heading / H3", size: 20, weight: "Medium", lineHeight: 28 },
     { name: "Heading / H4", size: 18, weight: "Medium", lineHeight: 26 },
     { name: "Heading / H5", size: 16, weight: "Medium", lineHeight: 24 },
