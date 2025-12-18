@@ -3468,6 +3468,7 @@ async function createPagination(colors: { primary: string; secondary: string }) 
   const primaryRgb = hexToRgb(colors.primary);
 
   const types = ["Simple", "Numbers", "Complete"];
+  const styles = ["Bordered", "Borderless"];
   const sizes = [
     { name: "SM", buttonSize: 32, fontSize: 12, spacing: 4 },
     { name: "MD", buttonSize: 40, fontSize: 14, spacing: 6 },
@@ -3478,7 +3479,7 @@ async function createPagination(colors: { primary: string; secondary: string }) 
   const paginationMap: Record<string, ComponentNode> = {};
 
   // Helper function to create a page button
-  const createPageButton = (label: string, isActive: boolean, size: typeof sizes[0]) => {
+  const createPageButton = (label: string, isActive: boolean, style: string, size: typeof sizes[0]) => {
     const btn = figma.createFrame();
     btn.name = label;
     btn.layoutMode = "HORIZONTAL";
@@ -3489,58 +3490,75 @@ async function createPagination(colors: { primary: string; secondary: string }) 
     btn.resize(size.buttonSize, size.buttonSize);
     btn.cornerRadius = 4;
 
-    if (isActive) {
-      applyVariableToFill(btn, "interactive/primary", primaryRgb);
+    if (style === "Bordered") {
+      // Bordered style: has border and white background
+      if (isActive) {
+        applyVariableToFill(btn, "interactive/primary", primaryRgb);
+      } else {
+        applyVariableToFill(btn, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(btn, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        btn.strokeWeight = 1;
+      }
     } else {
-      applyVariableToFill(btn, "bg/primary", { r: 1, g: 1, b: 1 });
-      applyVariableToStroke(btn, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
-      btn.strokeWeight = 1;
+      // Borderless style: no border, subtle background
+      if (isActive) {
+        applyVariableToFill(btn, "interactive/primary", primaryRgb);
+      } else {
+        btn.fills = [];
+      }
     }
 
     const text = figma.createText();
     text.fontName = { family: "Pretendard", style: isActive ? "Medium" : "Regular" };
     text.fontSize = size.fontSize;
     text.characters = label;
-    text.fills = [{ type: "SOLID", color: isActive ? { r: 1, g: 1, b: 1 } : { r: 0.2, g: 0.2, b: 0.2 } }];
-    btn.appendChild(text);
 
+    if (style === "Bordered") {
+      text.fills = [{ type: "SOLID", color: isActive ? { r: 1, g: 1, b: 1 } : { r: 0.2, g: 0.2, b: 0.2 } }];
+    } else {
+      text.fills = [{ type: "SOLID", color: isActive ? { r: 1, g: 1, b: 1 } : { r: 0.4, g: 0.4, b: 0.4 } }];
+    }
+
+    btn.appendChild(text);
     return btn;
   };
 
   for (const type of types) {
-    for (const size of sizes) {
-      const pagination = figma.createComponent();
-      pagination.name = `Type=${type}, Size=${size.name}`;
-      pagination.layoutMode = "HORIZONTAL";
-      pagination.primaryAxisSizingMode = "AUTO";
-      pagination.counterAxisSizingMode = "AUTO";
-      pagination.primaryAxisAlignItems = "CENTER";
-      pagination.counterAxisAlignItems = "CENTER";
-      pagination.itemSpacing = size.spacing;
-      pagination.fills = [];
+    for (const style of styles) {
+      for (const size of sizes) {
+        const pagination = figma.createComponent();
+        pagination.name = `Type=${type}, Style=${style}, Size=${size.name}`;
+        pagination.layoutMode = "HORIZONTAL";
+        pagination.primaryAxisSizingMode = "AUTO";
+        pagination.counterAxisSizingMode = "AUTO";
+        pagination.primaryAxisAlignItems = "CENTER";
+        pagination.counterAxisAlignItems = "CENTER";
+        pagination.itemSpacing = size.spacing;
+        pagination.fills = [];
 
-      if (type === "Simple") {
-        // [< Previous] [Next >]
-        pagination.appendChild(createPageButton("<", false, size));
-        pagination.appendChild(createPageButton(">", false, size));
-      } else if (type === "Numbers") {
-        // [1] [2] [3] [4] [5]
-        for (let i = 1; i <= 5; i++) {
-          pagination.appendChild(createPageButton(String(i), i === 2, size));
+        if (type === "Simple") {
+          // [< Previous] [Next >]
+          pagination.appendChild(createPageButton("<", false, style, size));
+          pagination.appendChild(createPageButton(">", false, style, size));
+        } else if (type === "Numbers") {
+          // [1] [2] [3] [4] [5]
+          for (let i = 1; i <= 5; i++) {
+            pagination.appendChild(createPageButton(String(i), i === 2, style, size));
+          }
+        } else { // Complete
+          // [< Previous] [1] [2] [3] [...] [10] [Next >]
+          pagination.appendChild(createPageButton("<", false, style, size));
+          pagination.appendChild(createPageButton("1", false, style, size));
+          pagination.appendChild(createPageButton("2", true, style, size));
+          pagination.appendChild(createPageButton("3", false, style, size));
+          pagination.appendChild(createPageButton("...", false, style, size));
+          pagination.appendChild(createPageButton("10", false, style, size));
+          pagination.appendChild(createPageButton(">", false, style, size));
         }
-      } else { // Complete
-        // [< Previous] [1] [2] [3] [...] [10] [Next >]
-        pagination.appendChild(createPageButton("<", false, size));
-        pagination.appendChild(createPageButton("1", false, size));
-        pagination.appendChild(createPageButton("2", true, size));
-        pagination.appendChild(createPageButton("3", false, size));
-        pagination.appendChild(createPageButton("...", false, size));
-        pagination.appendChild(createPageButton("10", false, size));
-        pagination.appendChild(createPageButton(">", false, size));
-      }
 
-      components.push(pagination);
-      paginationMap[`${type}-${size.name}`] = pagination;
+        components.push(pagination);
+        paginationMap[`${type}-${style}-${size.name}`] = pagination;
+      }
     }
   }
 
@@ -3589,12 +3607,17 @@ async function createPagination(colors: { primary: string; secondary: string }) 
 
   const typeContent = await createPropertySection(docFrame, "Type", "Different pagination layouts.", 0);
   for (const type of types) {
-    await createValueItem(typeContent, type, paginationMap[`${type}-MD`]);
+    await createValueItem(typeContent, type, paginationMap[`${type}-Bordered-MD`]);
+  }
+
+  const styleContent = await createPropertySection(docFrame, "Style", "Border variants.", 0);
+  for (const style of styles) {
+    await createValueItem(styleContent, style, paginationMap[`Complete-${style}-MD`]);
   }
 
   const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
   for (const size of sizes) {
-    await createValueItem(sizeContent, size.name, paginationMap[`Complete-${size.name}`]);
+    await createValueItem(sizeContent, size.name, paginationMap[`Complete-Bordered-${size.name}`]);
   }
 
   componentSet.description = `Pagination Component
@@ -3603,6 +3626,7 @@ Complete pagination UI with navigation buttons and page numbers.
 
 Properties:
 • Type: Simple (prev/next), Numbers (page numbers), Complete (full navigation)
+• Style: Bordered (with border), Borderless (minimal style)
 • Size: SM (32px), MD (40px), LG (48px)`;
 
   figma.viewport.scrollAndZoomIntoView([docFrame]);
