@@ -3268,8 +3268,8 @@ async function createTooltips(colors: { primary: string; secondary: string }) {
       bubble.paddingRight = size.paddingX;
       bubble.paddingTop = size.paddingY;
       bubble.paddingBottom = size.paddingY;
-      bubble.cornerRadius = 6;
-      bubble.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+      bubble.cornerRadius = 5;
+      bubble.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
 
       const text = figma.createText();
       text.fontName = { family: "Pretendard", style: "Medium" };
@@ -3282,7 +3282,7 @@ async function createTooltips(colors: { primary: string; secondary: string }) {
       const arrow = figma.createPolygon();
       arrow.name = "Arrow";
       arrow.resize(size.arrowSize, size.arrowSize);
-      arrow.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+      arrow.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
 
       // Rotate arrow based on position
       if (position === "Top") {
@@ -3411,7 +3411,7 @@ async function createPagination(colors: { primary: string; secondary: string }) 
       pageBtn.counterAxisAlignItems = "CENTER";
       pageBtn.primaryAxisAlignItems = "CENTER";
       pageBtn.resize(size.size, size.size);
-      pageBtn.cornerRadius = 6;
+      pageBtn.cornerRadius = 4;
 
       if (state === "Active") {
         applyVariableToFill(pageBtn, "interactive/primary", primaryRgb);
@@ -3732,7 +3732,7 @@ async function createModals(colors: { primary: string; secondary: string }) {
       modal.paddingLeft = 24;
       modal.paddingRight = 24;
       modal.itemSpacing = 16;
-      modal.cornerRadius = 12;
+      modal.cornerRadius = 16;
       modal.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
       modal.effects = [{
         type: "DROP_SHADOW",
@@ -3769,18 +3769,20 @@ async function createModals(colors: { primary: string; secondary: string }) {
       // Close button
       const closeButton = figma.createFrame();
       closeButton.name = "Close Button";
-      closeButton.resize(24, 24);
+      closeButton.resize(32, 32);
       closeButton.layoutMode = "HORIZONTAL";
       closeButton.primaryAxisAlignItems = "CENTER";
       closeButton.counterAxisAlignItems = "CENTER";
       closeButton.fills = [];
-      closeButton.cornerRadius = 4;
+      closeButton.cornerRadius = 6;
+      closeButton.strokes = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.91 } }];
+      closeButton.strokeWeight = 1;
 
       const closeIcon = figma.createText();
-      closeIcon.fontName = { family: "Pretendard", style: "Regular" };
-      closeIcon.fontSize = 20;
+      closeIcon.fontName = { family: "Pretendard", style: "Bold" };
+      closeIcon.fontSize = 24;
       closeIcon.characters = "×";
-      closeIcon.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+      closeIcon.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.55 } }];
       closeButton.appendChild(closeIcon);
       header.appendChild(closeButton);
 
@@ -3809,6 +3811,13 @@ async function createModals(colors: { primary: string; secondary: string }) {
 
       // Footer with action buttons
       if (actionType !== "None") {
+        // Divider before footer
+        const divider = figma.createRectangle();
+        divider.name = "Divider";
+        divider.resize(size.width - 48, 1);
+        divider.fills = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.91 } }];
+        modal.appendChild(divider);
+
         const footer = figma.createFrame();
         footer.name = "Footer";
         footer.layoutMode = "HORIZONTAL";
@@ -3828,14 +3837,16 @@ async function createModals(colors: { primary: string; secondary: string }) {
           cancelButton.layoutMode = "HORIZONTAL";
           cancelButton.primaryAxisAlignItems = "CENTER";
           cancelButton.counterAxisAlignItems = "CENTER";
-          cancelButton.cornerRadius = 6;
-          cancelButton.fills = [{ type: "SOLID", color: { r: 0.95, g: 0.95, b: 0.95 } }];
+          cancelButton.cornerRadius = 8;
+          cancelButton.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+          cancelButton.strokes = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+          cancelButton.strokeWeight = 1;
 
           const cancelText = figma.createText();
-          cancelText.fontName = { family: "Pretendard", style: "Medium" };
-          cancelText.fontSize = size.name === "SM" ? 13 : size.name === "MD" ? 14 : 15;
+          cancelText.fontName = { family: "Pretendard", style: "Bold" };
+          cancelText.fontSize = 14;
           cancelText.characters = "Cancel";
-          cancelText.fills = [{ type: "SOLID", color: { r: 0.3, g: 0.3, b: 0.3 } }];
+          cancelText.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.55 } }];
           cancelButton.appendChild(cancelText);
           footer.appendChild(cancelButton);
         }
@@ -3847,12 +3858,12 @@ async function createModals(colors: { primary: string; secondary: string }) {
         confirmButton.layoutMode = "HORIZONTAL";
         confirmButton.primaryAxisAlignItems = "CENTER";
         confirmButton.counterAxisAlignItems = "CENTER";
-        confirmButton.cornerRadius = 6;
+        confirmButton.cornerRadius = 8;
         applyVariableToFill(confirmButton, "interactive/primary", primaryRgb);
 
         const confirmText = figma.createText();
-        confirmText.fontName = { family: "Pretendard", style: "Medium" };
-        confirmText.fontSize = size.name === "SM" ? 13 : size.name === "MD" ? 14 : 15;
+        confirmText.fontName = { family: "Pretendard", style: "Bold" };
+        confirmText.fontSize = 14;
         confirmText.characters = actionType === "Single" ? "OK" : "Confirm";
         confirmText.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
         confirmButton.appendChild(confirmText);
