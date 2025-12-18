@@ -149,7 +149,7 @@
     <button class="btn btn-secondary" onclick="createInputs()">📝 Inputs</button>
     <button class="btn btn-secondary" onclick="createCheckboxes()">☑️ Checkboxes</button>
     <button class="btn btn-secondary" onclick="createRadios()">🔘 Radios</button>
-    <button class="btn btn-secondary" onclick="createToggles()">🔄 Toggles</button>
+    <button class="btn btn-secondary" onclick="createSwitches()">🔄 Switches</button>
   </div>
 
   <div class="section">
@@ -157,12 +157,19 @@
     <button class="btn btn-secondary" onclick="createCards()">🃏 Cards</button>
     <button class="btn btn-secondary" onclick="createBadges()">🏷️ Badges</button>
     <button class="btn btn-secondary" onclick="createAvatars()">👤 Avatars</button>
+    <button class="btn btn-secondary" onclick="createLabels()">🏷️ Labels</button>
+    <button class="btn btn-secondary" onclick="createLinks()">🔗 Links</button>
+    <button class="btn btn-secondary" onclick="createTextareas()">📝 Textareas</button>
+    <button class="btn btn-secondary" onclick="createProgress()">📊 Progress</button>
+    <button class="btn btn-secondary" onclick="createSkeletons()">⬜ Skeletons</button>
+    <button class="btn btn-secondary" onclick="createSliders()">🎚️ Sliders</button>
+    <button class="btn btn-secondary" onclick="createToggles()">🔀 Toggles</button>
     <button class="btn btn-secondary" onclick="createChips()">🏷️ Chips</button>
   </div>
 
   <div class="section">
     <div class="section-title">6. Components - Layout</div>
-    <button class="btn btn-secondary" onclick="createDividers()">➖ Dividers</button>
+    <button class="btn btn-secondary" onclick="createSeparators()">➖ Separators</button>
     <button class="btn btn-secondary" onclick="createSpinners()">⏳ Spinners</button>
     <button class="btn btn-secondary" onclick="createAlerts()">⚠️ Alerts</button>
   </div>
@@ -250,10 +257,10 @@
       parent.postMessage({ pluginMessage: { type: 'create-radios', colors } }, '*');
     }
 
-    function createToggles() {
-      updateStatus('Toggles 컴포넌트 생성 중...');
+    function createSwitches() {
+      updateStatus('Switches 컴포넌트 생성 중...');
       const colors = getColors();
-      parent.postMessage({ pluginMessage: { type: 'create-toggles', colors } }, '*');
+      parent.postMessage({ pluginMessage: { type: 'create-switches', colors } }, '*');
     }
 
     function createAvatars() {
@@ -262,16 +269,58 @@
       parent.postMessage({ pluginMessage: { type: 'create-avatars', colors } }, '*');
     }
 
+    function createLabels() {
+      updateStatus('Labels 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-labels', colors } }, '*');
+    }
+
+    function createLinks() {
+      updateStatus('Links 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-links', colors } }, '*');
+    }
+
+    function createTextareas() {
+      updateStatus('Textareas 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-textareas', colors } }, '*');
+    }
+
+    function createProgress() {
+      updateStatus('Progress 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-progress', colors } }, '*');
+    }
+
+    function createSkeletons() {
+      updateStatus('Skeletons 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-skeletons', colors } }, '*');
+    }
+
+    function createSliders() {
+      updateStatus('Sliders 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-sliders', colors } }, '*');
+    }
+
+    function createToggles() {
+      updateStatus('Toggles 컴포넌트 생성 중...');
+      const colors = getColors();
+      parent.postMessage({ pluginMessage: { type: 'create-toggles', colors } }, '*');
+    }
+
     function createChips() {
       updateStatus('Chips 컴포넌트 생성 중...');
       const colors = getColors();
       parent.postMessage({ pluginMessage: { type: 'create-chips', colors } }, '*');
     }
 
-    function createDividers() {
-      updateStatus('Dividers 컴포넌트 생성 중...');
+    function createSeparators() {
+      updateStatus('Separators 컴포넌트 생성 중...');
       const colors = getColors();
-      parent.postMessage({ pluginMessage: { type: 'create-dividers', colors } }, '*');
+      parent.postMessage({ pluginMessage: { type: 'create-separators', colors } }, '*');
     }
 
     function createSpinners() {

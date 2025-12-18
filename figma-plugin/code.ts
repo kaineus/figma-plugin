@@ -68,20 +68,28 @@ async function createPages() {
     "Foundations",
     "Icons",
     "---",
-    "Buttons",
-    "Inputs",
-    "Checkboxes",
-    "Radios",
-    "Toggles",
-    "Cards",
-    "Badges",
-    "Avatars",
-    "Chips",
-    "Dividers",
-    "Spinners",
     "Alerts",
+    "Avatars",
+    "Badges",
+    "Buttons",
+    "Cards",
+    "Checkboxes",
+    "Chips",
+    "Inputs",
+    "Labels",
+    "Links",
+    "Progress",
+    "Radios",
+    "Separators",
+    "Skeletons",
+    "Sliders",
+    "Spinners",
+    "Switches",
+    "Textareas",
+    "Toggles",
     "---",
     "Templates",
+    "---",
     "Playground"
   ];
   const existingNames = figma.root.children.map(p => p.name);
@@ -1580,19 +1588,19 @@ Properties:
 }
 
 // ═══════════════════════════════════════════════════════════
-// Toggle Component
+// Switch Component
 // ═══════════════════════════════════════════════════════════
-async function createToggles(colors: { primary: string; secondary: string }) {
+async function createSwitches(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Inter", style: "Regular" });
   await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
   await figma.loadFontAsync({ family: "Inter", style: "Bold" });
 
-  let togglePage = figma.root.children.find(p => p.name === "Toggles") as PageNode | undefined;
-  if (!togglePage) { togglePage = figma.createPage(); togglePage.name = "Toggles"; }
-  togglePage.backgrounds = [LIGHT_BG];
-  await figma.setCurrentPageAsync(togglePage);
+  let switchPage = figma.root.children.find(p => p.name === "Switches") as PageNode | undefined;
+  if (!switchPage) { switchPage = figma.createPage(); switchPage.name = "Switches"; }
+  switchPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(switchPage);
 
-  for (const child of [...togglePage.children]) {
+  for (const child of [...switchPage.children]) {
     try { child.remove(); } catch (e) { /* skip */ }
   }
 
@@ -1606,21 +1614,21 @@ async function createToggles(colors: { primary: string; secondary: string }) {
   ];
 
   const components: ComponentNode[] = [];
-  const toggleMap: Record<string, ComponentNode> = {};
+  const switchMap: Record<string, ComponentNode> = {};
 
   for (const state of states) {
     for (const size of sizes) {
-      const toggle = figma.createComponent();
-      toggle.name = `State=${state}, Size=${size.name}`;
-      toggle.resize(size.width, size.height);
-      toggle.cornerRadius = size.height / 2;
+      const switchComp = figma.createComponent();
+      switchComp.name = `State=${state}, Size=${size.name}`;
+      switchComp.resize(size.width, size.height);
+      switchComp.cornerRadius = size.height / 2;
 
       if (state === "On") {
-        applyVariableToFill(toggle, "interactive/primary", primaryRgb);
+        applyVariableToFill(switchComp, "interactive/primary", primaryRgb);
       } else if (state === "Disabled") {
-        applyVariableToFill(toggle, "bg/secondary", { r: 0.9, g: 0.9, b: 0.9 });
+        applyVariableToFill(switchComp, "bg/secondary", { r: 0.9, g: 0.9, b: 0.9 });
       } else { // Off
-        applyVariableToFill(toggle, "interactive/secondary", { r: 0.83, g: 0.83, b: 0.83 });
+        applyVariableToFill(switchComp, "interactive/secondary", { r: 0.83, g: 0.83, b: 0.83 });
       }
 
       // Knob
@@ -1629,22 +1637,22 @@ async function createToggles(colors: { primary: string; secondary: string }) {
       knob.x = state === "On" ? size.width - size.knobSize - size.knobPadding : size.knobPadding;
       knob.y = size.knobPadding;
       knob.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
-      toggle.appendChild(knob);
+      switchComp.appendChild(knob);
 
-      components.push(toggle);
-      toggleMap[`${state}-${size.name}`] = toggle;
+      components.push(switchComp);
+      switchMap[`${state}-${size.name}`] = switchComp;
     }
   }
 
-  const componentSet = figma.combineAsVariants(components, togglePage);
-  componentSet.name = "Toggle";
+  const componentSet = figma.combineAsVariants(components, switchPage);
+  componentSet.name = "Switch";
   componentSet.x = 100;
   componentSet.y = 100;
   componentSet.visible = false;
 
   // Create documentation frame
   const docFrame = figma.createFrame();
-  docFrame.name = "Toggle Documentation";
+  docFrame.name = "Switch Documentation";
   docFrame.layoutMode = "VERTICAL";
   docFrame.primaryAxisSizingMode = "AUTO";
   docFrame.counterAxisSizingMode = "AUTO";
@@ -1664,39 +1672,39 @@ async function createToggles(colors: { primary: string; secondary: string }) {
   const mainTitle = figma.createText();
   mainTitle.fontName = { family: "Inter", style: "Bold" };
   mainTitle.fontSize = 32;
-  mainTitle.characters = "Toggle";
+  mainTitle.characters = "Switch";
   mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
   mainDesc.fontName = { family: "Inter", style: "Regular" };
   mainDesc.fontSize = 16;
-  mainDesc.characters = "Toggles allow users to switch between two states.";
+  mainDesc.characters = "Switches allow users to toggle between two states.";
   mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
 
-  const stateContent = await createPropertySection(docFrame, "State", "Toggle states for on/off interactions.", 0);
+  const stateContent = await createPropertySection(docFrame, "State", "Switch states for on/off interactions.", 0);
   for (const state of states) {
-    await createValueItem(stateContent, state, toggleMap[`${state}-MD`]);
+    await createValueItem(stateContent, state, switchMap[`${state}-MD`]);
   }
 
   const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
   for (const size of sizes) {
-    await createValueItem(sizeContent, size.name, toggleMap[`Off-${size.name}`]);
+    await createValueItem(sizeContent, size.name, switchMap[`Off-${size.name}`]);
   }
 
-  componentSet.description = `Toggle Component
+  componentSet.description = `Switch Component
 
-Toggles allow users to switch between two states.
+Switches allow users to toggle between two states.
 
 Properties:
 • State: Off, On, Disabled
 • Size: SM, MD, LG`;
 
   figma.viewport.scrollAndZoomIntoView([docFrame]);
-  sendStatus("Toggles created! (" + components.length + " variants)", "success");
+  sendStatus("Switches created! (" + components.length + " variants)", "success");
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1806,6 +1814,898 @@ Properties:
 
   figma.viewport.scrollAndZoomIntoView([docFrame]);
   sendStatus("Avatars created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Label Component
+// ═══════════════════════════════════════════════════════════
+async function createLabels(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let labelPage = figma.root.children.find(p => p.name === "Labels") as PageNode | undefined;
+  if (!labelPage) { labelPage = figma.createPage(); labelPage.name = "Labels"; }
+  labelPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(labelPage);
+
+  for (const child of [...labelPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const states = ["Default", "Required", "Disabled"];
+  const sizes = [
+    { name: "SM", fontSize: 12, lineHeight: 16 },
+    { name: "MD", fontSize: 14, lineHeight: 20 },
+    { name: "LG", fontSize: 16, lineHeight: 24 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const labelMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const label = figma.createComponent();
+      label.name = `State=${state}, Size=${size.name}`;
+      label.layoutMode = "HORIZONTAL";
+      label.primaryAxisSizingMode = "AUTO";
+      label.counterAxisSizingMode = "AUTO";
+      label.itemSpacing = 4;
+      label.fills = [];
+
+      const text = figma.createText();
+      text.fontName = { family: "Inter", style: state === "Required" ? "Medium" : "Regular" };
+      text.fontSize = size.fontSize;
+      text.characters = "Label";
+
+      if (state === "Disabled") {
+        applyVariableToFill(text, "text/disabled", { r: 0.64, g: 0.64, b: 0.64 });
+      } else {
+        applyVariableToFill(text, "text/primary", { r: 0.1, g: 0.1, b: 0.12 });
+      }
+
+      label.appendChild(text);
+
+      // Add asterisk for required
+      if (state === "Required") {
+        const asterisk = figma.createText();
+        asterisk.fontName = { family: "Inter", style: "Medium" };
+        asterisk.fontSize = size.fontSize;
+        asterisk.characters = "*";
+        applyVariableToFill(asterisk, "text/danger", { r: 0.86, g: 0.20, b: 0.20 });
+        label.appendChild(asterisk);
+      }
+
+      components.push(label);
+      labelMap[`${state}-${size.name}`] = label;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, labelPage);
+  componentSet.name = "Label";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Label Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 700;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Label";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Text labels for form fields and UI elements.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const stateContent = await createPropertySection(docFrame, "State", "Label states for different contexts.", 0);
+  for (const state of states) {
+    await createValueItem(stateContent, state, labelMap[`${state}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, labelMap[`Default-${size.name}`]);
+  }
+
+  componentSet.description = `Label Component
+
+Text labels for form fields and UI elements.
+
+Properties:
+• State: Default, Required, Disabled
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Labels created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Link Component
+// ═══════════════════════════════════════════════════════════
+async function createLinks(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let linkPage = figma.root.children.find(p => p.name === "Links") as PageNode | undefined;
+  if (!linkPage) { linkPage = figma.createPage(); linkPage.name = "Links"; }
+  linkPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(linkPage);
+
+  for (const child of [...linkPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const states = ["Default", "Hover", "Visited", "Disabled"];
+  const sizes = [
+    { name: "SM", fontSize: 12, lineHeight: 16 },
+    { name: "MD", fontSize: 14, lineHeight: 20 },
+    { name: "LG", fontSize: 16, lineHeight: 24 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const linkMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const link = figma.createComponent();
+      link.name = `State=${state}, Size=${size.name}`;
+      link.layoutMode = "HORIZONTAL";
+      link.primaryAxisSizingMode = "AUTO";
+      link.counterAxisSizingMode = "AUTO";
+      link.fills = [];
+
+      const text = figma.createText();
+      text.fontName = { family: "Inter", style: "Medium" };
+      text.fontSize = size.fontSize;
+      text.characters = "Link";
+      text.textDecoration = state === "Default" || state === "Hover" ? "UNDERLINE" : "NONE";
+
+      if (state === "Disabled") {
+        applyVariableToFill(text, "text/disabled", { r: 0.64, g: 0.64, b: 0.64 });
+      } else if (state === "Visited") {
+        applyVariableToFill(text, "interactive/secondary-hover", { r: 0.45, g: 0.42, b: 0.73 });
+      } else {
+        applyVariableToFill(text, "text/brand", primaryRgb);
+      }
+
+      link.appendChild(text);
+
+      components.push(link);
+      linkMap[`${state}-${size.name}`] = link;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, linkPage);
+  componentSet.name = "Link";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Link Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 700;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Link";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Hyperlinks for navigation and actions.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const stateContent = await createPropertySection(docFrame, "State", "Link states for different interactions.", 0);
+  for (const state of states) {
+    await createValueItem(stateContent, state, linkMap[`${state}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, linkMap[`Default-${size.name}`]);
+  }
+
+  componentSet.description = `Link Component
+
+Hyperlinks for navigation and actions.
+
+Properties:
+• State: Default, Hover, Visited, Disabled
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Links created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Textarea Component
+// ═══════════════════════════════════════════════════════════
+async function createTextareas(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let textareaPage = figma.root.children.find(p => p.name === "Textareas") as PageNode | undefined;
+  if (!textareaPage) { textareaPage = figma.createPage(); textareaPage.name = "Textareas"; }
+  textareaPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(textareaPage);
+
+  for (const child of [...textareaPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const states = ["Default", "Focus", "Error", "Disabled"];
+  const sizes = [
+    { name: "SM", height: 80, paddingX: 12, paddingY: 8, fontSize: 12 },
+    { name: "MD", height: 100, paddingX: 14, paddingY: 10, fontSize: 14 },
+    { name: "LG", height: 120, paddingX: 16, paddingY: 12, fontSize: 16 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const textareaMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const textarea = figma.createComponent();
+      textarea.name = `State=${state}, Size=${size.name}`;
+      textarea.layoutMode = "VERTICAL";
+      textarea.primaryAxisSizingMode = "FIXED";
+      textarea.counterAxisSizingMode = "FIXED";
+      textarea.primaryAxisAlignItems = "MIN";
+      textarea.paddingLeft = size.paddingX;
+      textarea.paddingRight = size.paddingX;
+      textarea.paddingTop = size.paddingY;
+      textarea.paddingBottom = size.paddingY;
+      textarea.resize(280, size.height);
+      textarea.cornerRadius = 8;
+
+      // Background and border based on state
+      if (state === "Default") {
+        applyVariableToFill(textarea, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(textarea, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        textarea.strokeWeight = 1;
+      } else if (state === "Focus") {
+        applyVariableToFill(textarea, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(textarea, "border/brand", primaryRgb);
+        textarea.strokeWeight = 2;
+      } else if (state === "Error") {
+        applyVariableToFill(textarea, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(textarea, "border/danger", { r: 0.86, g: 0.20, b: 0.20 });
+        textarea.strokeWeight = 2;
+      } else { // Disabled
+        applyVariableToFill(textarea, "bg/secondary", { r: 0.98, g: 0.98, b: 0.98 });
+        applyVariableToStroke(textarea, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        textarea.strokeWeight = 1;
+      }
+
+      // Placeholder text
+      const text = figma.createText();
+      text.fontName = { family: "Inter", style: "Regular" };
+      text.fontSize = size.fontSize;
+      text.characters = state === "Disabled" ? "Disabled" : "Enter text...";
+      applyVariableToFill(text, state === "Disabled" ? "text/disabled" : "text/secondary", { r: 0.64, g: 0.64, b: 0.64 });
+      textarea.appendChild(text);
+
+      components.push(textarea);
+      textareaMap[`${state}-${size.name}`] = textarea;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, textareaPage);
+  componentSet.name = "Textarea";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Textarea Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 800;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Textarea";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Multi-line text input fields for longer content.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const stateContent = await createPropertySection(docFrame, "State", "Visual feedback for different interaction states.", 0);
+  for (const state of states) {
+    await createValueItem(stateContent, state, textareaMap[`${state}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, textareaMap[`Default-${size.name}`]);
+  }
+
+  componentSet.description = `Textarea Component
+
+Multi-line text input fields for longer content.
+
+Properties:
+• State: Default, Focus, Error, Disabled
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Textareas created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Progress Bar Component
+// ═══════════════════════════════════════════════════════════
+async function createProgressBars(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let progressPage = figma.root.children.find(p => p.name === "Progress") as PageNode | undefined;
+  if (!progressPage) { progressPage = figma.createPage(); progressPage.name = "Progress"; }
+  progressPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(progressPage);
+
+  for (const child of [...progressPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const values = [0, 25, 50, 75, 100];
+  const sizes = [
+    { name: "SM", height: 4, width: 200 },
+    { name: "MD", height: 8, width: 200 },
+    { name: "LG", height: 12, width: 200 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const progressMap: Record<string, ComponentNode> = {};
+
+  for (const value of values) {
+    for (const size of sizes) {
+      const progress = figma.createComponent();
+      progress.name = `Value=${value}, Size=${size.name}`;
+      progress.layoutMode = "HORIZONTAL";
+      progress.primaryAxisSizingMode = "FIXED";
+      progress.counterAxisSizingMode = "FIXED";
+      progress.resize(size.width, size.height);
+      progress.cornerRadius = size.height / 2;
+      applyVariableToFill(progress, "bg/secondary", { r: 0.95, g: 0.95, b: 0.95 });
+
+      // Progress fill
+      if (value > 0) {
+        const fill = figma.createRectangle();
+        fill.resize((size.width * value) / 100, size.height);
+        fill.cornerRadius = size.height / 2;
+        applyVariableToFill(fill, "interactive/primary", primaryRgb);
+        progress.appendChild(fill);
+      }
+
+      components.push(progress);
+      progressMap[`${value}-${size.name}`] = progress;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, progressPage);
+  componentSet.name = "Progress";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  const docFrame = figma.createFrame();
+  docFrame.name = "Progress Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 700;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Progress";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Progress indicators show completion status.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const valueContent = await createPropertySection(docFrame, "Value", "Progress completion percentage.", 0);
+  for (const value of [0, 50, 100]) {
+    await createValueItem(valueContent, `${value}%`, progressMap[`${value}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, progressMap[`50-${size.name}`]);
+  }
+
+  componentSet.description = `Progress Component
+
+Progress indicators show completion status.
+
+Properties:
+• Value: 0%, 25%, 50%, 75%, 100%
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Progress bars created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Skeleton Component
+// ═══════════════════════════════════════════════════════════
+async function createSkeletons(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let skeletonPage = figma.root.children.find(p => p.name === "Skeletons") as PageNode | undefined;
+  if (!skeletonPage) { skeletonPage = figma.createPage(); skeletonPage.name = "Skeletons"; }
+  skeletonPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(skeletonPage);
+
+  for (const child of [...skeletonPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const types = ["Text", "Circle", "Rectangle"];
+  const sizes = [
+    { name: "SM", textHeight: 12, circleSize: 32, rectWidth: 120, rectHeight: 12 },
+    { name: "MD", textHeight: 16, circleSize: 48, rectWidth: 200, rectHeight: 16 },
+    { name: "LG", textHeight: 20, circleSize: 64, rectWidth: 280, rectHeight: 20 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const skeletonMap: Record<string, ComponentNode> = {};
+
+  for (const type of types) {
+    for (const size of sizes) {
+      const skeleton = figma.createComponent();
+      skeleton.name = `Type=${type}, Size=${size.name}`;
+
+      if (type === "Text") {
+        skeleton.resize(200, size.textHeight);
+        skeleton.cornerRadius = 4;
+      } else if (type === "Circle") {
+        skeleton.resize(size.circleSize, size.circleSize);
+        skeleton.cornerRadius = size.circleSize / 2;
+      } else { // Rectangle
+        skeleton.resize(size.rectWidth, size.rectHeight);
+        skeleton.cornerRadius = 8;
+      }
+
+      applyVariableToFill(skeleton, "bg/secondary", { r: 0.93, g: 0.93, b: 0.93 });
+
+      components.push(skeleton);
+      skeletonMap[`${type}-${size.name}`] = skeleton;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, skeletonPage);
+  componentSet.name = "Skeleton";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  const docFrame = figma.createFrame();
+  docFrame.name = "Skeleton Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 700;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Skeleton";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Skeleton loaders indicate content is loading.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const typeContent = await createPropertySection(docFrame, "Type", "Skeleton shape variants.", 0);
+  for (const type of types) {
+    await createValueItem(typeContent, type, skeletonMap[`${type}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, skeletonMap[`Rectangle-${size.name}`]);
+  }
+
+  componentSet.description = `Skeleton Component
+
+Skeleton loaders indicate content is loading.
+
+Properties:
+• Type: Text, Circle, Rectangle
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Skeletons created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Slider Component
+// ═══════════════════════════════════════════════════════════
+async function createSliders(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let sliderPage = figma.root.children.find(p => p.name === "Sliders") as PageNode | undefined;
+  if (!sliderPage) { sliderPage = figma.createPage(); sliderPage.name = "Sliders"; }
+  sliderPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(sliderPage);
+
+  for (const child of [...sliderPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const values = [0, 50, 100];
+  const sizes = [
+    { name: "SM", trackHeight: 4, thumbSize: 16, width: 200 },
+    { name: "MD", trackHeight: 6, thumbSize: 20, width: 200 },
+    { name: "LG", trackHeight: 8, thumbSize: 24, width: 200 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const sliderMap: Record<string, ComponentNode> = {};
+
+  for (const value of values) {
+    for (const size of sizes) {
+      const slider = figma.createComponent();
+      slider.name = `Value=${value}, Size=${size.name}`;
+      slider.resize(size.width, size.thumbSize);
+
+      // Track background
+      const trackBg = figma.createRectangle();
+      trackBg.resize(size.width, size.trackHeight);
+      trackBg.x = 0;
+      trackBg.y = (size.thumbSize - size.trackHeight) / 2;
+      trackBg.cornerRadius = size.trackHeight / 2;
+      applyVariableToFill(trackBg, "bg/secondary", { r: 0.93, g: 0.93, b: 0.93 });
+      slider.appendChild(trackBg);
+
+      // Active track
+      if (value > 0) {
+        const trackActive = figma.createRectangle();
+        const activeWidth = (size.width * value) / 100;
+        trackActive.resize(activeWidth, size.trackHeight);
+        trackActive.x = 0;
+        trackActive.y = (size.thumbSize - size.trackHeight) / 2;
+        trackActive.cornerRadius = size.trackHeight / 2;
+        applyVariableToFill(trackActive, "interactive/primary", primaryRgb);
+        slider.appendChild(trackActive);
+      }
+
+      // Thumb
+      const thumb = figma.createEllipse();
+      thumb.resize(size.thumbSize, size.thumbSize);
+      const thumbX = Math.max(0, Math.min(size.width - size.thumbSize, (size.width * value) / 100 - size.thumbSize / 2));
+      thumb.x = thumbX;
+      thumb.y = 0;
+      thumb.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      thumb.strokeWeight = 2;
+      applyVariableToStroke(thumb, "interactive/primary", primaryRgb);
+      slider.appendChild(thumb);
+
+      components.push(slider);
+      sliderMap[`${value}-${size.name}`] = slider;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, sliderPage);
+  componentSet.name = "Slider";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  const docFrame = figma.createFrame();
+  docFrame.name = "Slider Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 700;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Slider";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Sliders allow users to select a value from a range.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const valueContent = await createPropertySection(docFrame, "Value", "Slider position.", 0);
+  for (const value of values) {
+    await createValueItem(valueContent, `${value}%`, sliderMap[`${value}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, sliderMap[`50-${size.name}`]);
+  }
+
+  componentSet.description = `Slider Component
+
+Sliders allow users to select a value from a range.
+
+Properties:
+• Value: 0%, 50%, 100%
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Sliders created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Toggle (Segmented Control) Component
+// ═══════════════════════════════════════════════════════════
+async function createToggles(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
+  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+
+  let togglePage = figma.root.children.find(p => p.name === "Toggles") as PageNode | undefined;
+  if (!togglePage) { togglePage = figma.createPage(); togglePage.name = "Toggles"; }
+  togglePage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(togglePage);
+
+  for (const child of [...togglePage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const options = [2, 3];
+  const sizes = [
+    { name: "SM", height: 32, fontSize: 12, padding: 4 },
+    { name: "MD", height: 40, fontSize: 14, padding: 4 },
+    { name: "LG", height: 48, fontSize: 16, padding: 4 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const toggleMap: Record<string, ComponentNode> = {};
+
+  for (const optionCount of options) {
+    for (const size of sizes) {
+      const toggle = figma.createComponent();
+      toggle.name = `Options=${optionCount}, Size=${size.name}`;
+      toggle.layoutMode = "HORIZONTAL";
+      toggle.primaryAxisSizingMode = "AUTO";
+      toggle.counterAxisSizingMode = "FIXED";
+      toggle.resize(200, size.height);
+      toggle.itemSpacing = 0;
+      toggle.padding = size.padding;
+      toggle.cornerRadius = 8;
+      applyVariableToFill(toggle, "bg/secondary", { r: 0.95, g: 0.95, b: 0.95 });
+
+      for (let i = 0; i < optionCount; i++) {
+        const option = figma.createFrame();
+        option.layoutMode = "HORIZONTAL";
+        option.primaryAxisSizingMode = "FIXED";
+        option.counterAxisSizingMode = "FIXED";
+        option.primaryAxisAlignItems = "CENTER";
+        option.counterAxisAlignItems = "CENTER";
+        option.resize(80, size.height - size.padding * 2);
+        option.cornerRadius = 6;
+        option.paddingLeft = 12;
+        option.paddingRight = 12;
+
+        if (i === 0) {
+          applyVariableToFill(option, "bg/primary", { r: 1, g: 1, b: 1 });
+          option.effects = [{ type: "DROP_SHADOW", color: { r: 0, g: 0, b: 0, a: 0.1 }, offset: { x: 0, y: 1 }, radius: 2, visible: true, blendMode: "NORMAL" }];
+        } else {
+          option.fills = [];
+        }
+
+        const text = figma.createText();
+        text.fontName = { family: "Inter", style: i === 0 ? "Medium" : "Regular" };
+        text.fontSize = size.fontSize;
+        text.characters = i === 0 ? "Option 1" : `Option ${i + 1}`;
+        applyVariableToFill(text, i === 0 ? "text/primary" : "text/secondary", i === 0 ? { r: 0.1, g: 0.1, b: 0.12 } : { r: 0.5, g: 0.5, b: 0.5 });
+        option.appendChild(text);
+
+        toggle.appendChild(option);
+      }
+
+      components.push(toggle);
+      toggleMap[`${optionCount}-${size.name}`] = toggle;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, togglePage);
+  componentSet.name = "Toggle";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  const docFrame = figma.createFrame();
+  docFrame.name = "Toggle Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 700;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Inter", style: "Bold" };
+  mainTitle.fontSize = 32;
+  mainTitle.characters = "Toggle (Segmented Control)";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Inter", style: "Regular" };
+  mainDesc.fontSize = 16;
+  mainDesc.characters = "Segmented controls allow users to switch between multiple options.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const optionsContent = await createPropertySection(docFrame, "Options", "Number of toggle options.", 0);
+  for (const optionCount of options) {
+    await createValueItem(optionsContent, `${optionCount} Options`, toggleMap[`${optionCount}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, toggleMap[`2-${size.name}`]);
+  }
+
+  componentSet.description = `Toggle (Segmented Control) Component
+
+Segmented controls allow users to switch between multiple options.
+
+Properties:
+• Options: 2, 3
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Toggles created! (" + components.length + " variants)", "success");
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -1934,19 +2834,19 @@ Properties:
 }
 
 // ═══════════════════════════════════════════════════════════
-// Divider Component
+// Separator Component
 // ═══════════════════════════════════════════════════════════
-async function createDividers(colors: { primary: string; secondary: string }) {
+async function createSeparators(colors: { primary: string; secondary: string }) {
   await figma.loadFontAsync({ family: "Inter", style: "Regular" });
   await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
   await figma.loadFontAsync({ family: "Inter", style: "Bold" });
 
-  let dividerPage = figma.root.children.find(p => p.name === "Dividers") as PageNode | undefined;
-  if (!dividerPage) { dividerPage = figma.createPage(); dividerPage.name = "Dividers"; }
-  dividerPage.backgrounds = [LIGHT_BG];
-  await figma.setCurrentPageAsync(dividerPage);
+  let separatorPage = figma.root.children.find(p => p.name === "Separators") as PageNode | undefined;
+  if (!separatorPage) { separatorPage = figma.createPage(); separatorPage.name = "Separators"; }
+  separatorPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(separatorPage);
 
-  for (const child of [...dividerPage.children]) {
+  for (const child of [...separatorPage.children]) {
     try { child.remove(); } catch (e) { /* skip */ }
   }
 
@@ -1958,35 +2858,35 @@ async function createDividers(colors: { primary: string; secondary: string }) {
   ];
 
   const components: ComponentNode[] = [];
-  const dividerMap: Record<string, ComponentNode> = {};
+  const separatorMap: Record<string, ComponentNode> = {};
 
   for (const orientation of orientations) {
     for (const weight of weights) {
-      const divider = figma.createComponent();
-      divider.name = `Orientation=${orientation}, Weight=${weight.name}`;
+      const separator = figma.createComponent();
+      separator.name = `Orientation=${orientation}, Weight=${weight.name}`;
 
       if (orientation === "Horizontal") {
-        divider.resize(200, weight.weight);
+        separator.resize(200, weight.weight);
       } else {
-        divider.resize(weight.weight, 100);
+        separator.resize(weight.weight, 100);
       }
 
-      applyVariableToFill(divider, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+      applyVariableToFill(separator, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
 
-      components.push(divider);
-      dividerMap[`${orientation}-${weight.name}`] = divider;
+      components.push(separator);
+      separatorMap[`${orientation}-${weight.name}`] = separator;
     }
   }
 
-  const componentSet = figma.combineAsVariants(components, dividerPage);
-  componentSet.name = "Divider";
+  const componentSet = figma.combineAsVariants(components, separatorPage);
+  componentSet.name = "Separator";
   componentSet.x = 100;
   componentSet.y = 100;
   componentSet.visible = false;
 
   // Create documentation frame
   const docFrame = figma.createFrame();
-  docFrame.name = "Divider Documentation";
+  docFrame.name = "Separator Documentation";
   docFrame.layoutMode = "VERTICAL";
   docFrame.primaryAxisSizingMode = "AUTO";
   docFrame.counterAxisSizingMode = "AUTO";
@@ -2006,39 +2906,39 @@ async function createDividers(colors: { primary: string; secondary: string }) {
   const mainTitle = figma.createText();
   mainTitle.fontName = { family: "Inter", style: "Bold" };
   mainTitle.fontSize = 32;
-  mainTitle.characters = "Divider";
+  mainTitle.characters = "Separator";
   mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
   mainDesc.fontName = { family: "Inter", style: "Regular" };
   mainDesc.fontSize = 16;
-  mainDesc.characters = "Dividers separate content into clear groups.";
+  mainDesc.characters = "Separators visually divide content into clear groups.";
   mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
 
-  const orientationContent = await createPropertySection(docFrame, "Orientation", "Horizontal or vertical dividers.", 0);
+  const orientationContent = await createPropertySection(docFrame, "Orientation", "Horizontal or vertical separators.", 0);
   for (const orientation of orientations) {
-    await createValueItem(orientationContent, orientation, dividerMap[`${orientation}-Medium`]);
+    await createValueItem(orientationContent, orientation, separatorMap[`${orientation}-Medium`]);
   }
 
   const weightContent = await createPropertySection(docFrame, "Weight", "Thickness variants for emphasis.", 0);
   for (const weight of weights) {
-    await createValueItem(weightContent, weight.name, dividerMap[`Horizontal-${weight.name}`]);
+    await createValueItem(weightContent, weight.name, separatorMap[`Horizontal-${weight.name}`]);
   }
 
-  componentSet.description = `Divider Component
+  componentSet.description = `Separator Component
 
-Dividers separate content into clear groups.
+Separators visually divide content into clear groups.
 
 Properties:
 • Orientation: Horizontal, Vertical
 • Weight: Thin (1px), Medium (2px), Thick (4px)`;
 
   figma.viewport.scrollAndZoomIntoView([docFrame]);
-  sendStatus("Dividers created! (" + components.length + " variants)", "success");
+  sendStatus("Separators created! (" + components.length + " variants)", "success");
 }
 
 // ═══════════════════════════════════════════════════════════
@@ -2460,19 +3360,33 @@ async function createAll(colors: { primary: string; secondary: string }) {
     await createCheckboxes(colors);
     sendStatus("11/18 Creating radios...");
     await createRadios(colors);
-    sendStatus("12/18 Creating toggles...");
-    await createToggles(colors);
+    sendStatus("12/18 Creating switches...");
+    await createSwitches(colors);
     sendStatus("13/18 Creating avatars...");
     await createAvatars(colors);
-    sendStatus("14/18 Creating chips...");
+    sendStatus("14/18 Creating labels...");
+    await createLabels(colors);
+    sendStatus("15/18 Creating links...");
+    await createLinks(colors);
+    sendStatus("16/26 Creating textareas...");
+    await createTextareas(colors);
+    sendStatus("17/26 Creating progress bars...");
+    await createProgressBars(colors);
+    sendStatus("18/26 Creating skeletons...");
+    await createSkeletons(colors);
+    sendStatus("19/26 Creating sliders...");
+    await createSliders(colors);
+    sendStatus("20/26 Creating toggles...");
+    await createToggles(colors);
+    sendStatus("21/26 Creating chips...");
     await createChips(colors);
-    sendStatus("15/18 Creating dividers...");
-    await createDividers(colors);
-    sendStatus("16/18 Creating spinners...");
+    sendStatus("22/26 Creating separators...");
+    await createSeparators(colors);
+    sendStatus("23/26 Creating spinners...");
     await createSpinners(colors);
-    sendStatus("17/18 Creating alerts...");
+    sendStatus("24/26 Creating alerts...");
     await createAlerts(colors);
-    sendStatus("18/18 Design system complete!", "success");
+    sendStatus("26/26 Design system complete!", "success");
   } catch (error) {
     sendStatus("Error: " + error, "error");
   }
@@ -2492,10 +3406,17 @@ figma.ui.onmessage = async (msg) => {
       case "create-inputs": await createInputs(msg.colors); break;
       case "create-checkboxes": await createCheckboxes(msg.colors); break;
       case "create-radios": await createRadios(msg.colors); break;
-      case "create-toggles": await createToggles(msg.colors); break;
+      case "create-switches": await createSwitches(msg.colors); break;
       case "create-avatars": await createAvatars(msg.colors); break;
+      case "create-labels": await createLabels(msg.colors); break;
+      case "create-links": await createLinks(msg.colors); break;
+      case "create-textareas": await createTextareas(msg.colors); break;
+      case "create-progress": await createProgressBars(msg.colors); break;
+      case "create-skeletons": await createSkeletons(msg.colors); break;
+      case "create-sliders": await createSliders(msg.colors); break;
+      case "create-toggles": await createToggles(msg.colors); break;
       case "create-chips": await createChips(msg.colors); break;
-      case "create-dividers": await createDividers(msg.colors); break;
+      case "create-separators": await createSeparators(msg.colors); break;
       case "create-spinners": await createSpinners(msg.colors); break;
       case "create-alerts": await createAlerts(msg.colors); break;
       case "create-all": await createAll(msg.colors); break;
