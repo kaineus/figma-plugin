@@ -52,7 +52,7 @@ async function createAnnotation(text: string, x: number, y: number, parent: Scen
   annotation.y = y;
 
   const label = figma.createText();
-  label.fontName = { family: "Inter", style: "Medium" };
+  label.fontName = { family: "Pretendard", style: "Medium" };
   label.fontSize = 11;
   label.characters = text;
   label.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
@@ -349,10 +349,10 @@ async function createVariables(colors: { primary: string; secondary: string }) {
 }
 
 async function createTypography() {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let foundationsPage = figma.root.children.find(p => p.name === "Foundations") as PageNode | undefined;
   if (!foundationsPage) { foundationsPage = figma.createPage(); foundationsPage.name = "Foundations"; }
@@ -380,7 +380,7 @@ async function createTypography() {
   let yOffset = 50;
   for (const t of titles) {
     const text = figma.createText();
-    text.fontName = { family: "Inter", style: t.weight };
+    text.fontName = { family: "Pretendard", style: t.weight };
     text.fontSize = t.size;
     text.lineHeight = { value: t.lineHeight, unit: "PIXELS" };
     text.characters = t.name;
@@ -390,7 +390,7 @@ async function createTypography() {
 
     const style = figma.createTextStyle();
     style.name = t.name;
-    style.fontName = { family: "Inter", style: t.weight };
+    style.fontName = { family: "Pretendard", style: t.weight };
     style.fontSize = t.size;
     style.lineHeight = { value: t.lineHeight, unit: "PIXELS" };
   }
@@ -413,7 +413,7 @@ async function createTypography() {
   yOffset = 50;
   for (const h of headings) {
     const text = figma.createText();
-    text.fontName = { family: "Inter", style: h.weight };
+    text.fontName = { family: "Pretendard", style: h.weight };
     text.fontSize = h.size;
     text.lineHeight = { value: h.lineHeight, unit: "PIXELS" };
     text.characters = h.name;
@@ -423,7 +423,7 @@ async function createTypography() {
 
     const style = figma.createTextStyle();
     style.name = h.name;
-    style.fontName = { family: "Inter", style: h.weight };
+    style.fontName = { family: "Pretendard", style: h.weight };
     style.fontSize = h.size;
     style.lineHeight = { value: h.lineHeight, unit: "PIXELS" };
   }
@@ -444,7 +444,7 @@ async function createTypography() {
   yOffset = 50;
   for (const b of bodies) {
     const text = figma.createText();
-    text.fontName = { family: "Inter", style: b.weight };
+    text.fontName = { family: "Pretendard", style: b.weight };
     text.fontSize = b.size;
     text.lineHeight = { value: b.lineHeight, unit: "PIXELS" };
     text.characters = b.name + " - The quick brown fox jumps over the lazy dog.";
@@ -454,7 +454,7 @@ async function createTypography() {
 
     const style = figma.createTextStyle();
     style.name = b.name;
-    style.fontName = { family: "Inter", style: b.weight };
+    style.fontName = { family: "Pretendard", style: b.weight };
     style.fontSize = b.size;
     style.lineHeight = { value: b.lineHeight, unit: "PIXELS" };
   }
@@ -507,7 +507,7 @@ async function createColorGroup(parent: SectionNode, groupName: string, shades: 
   parent.appendChild(groupFrame);
 
   const title = figma.createText();
-  title.fontName = { family: "Inter", style: "Medium" };
+  title.fontName = { family: "Pretendard", style: "Medium" };
   title.fontSize = 14;
   title.characters = groupName;
   title.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
@@ -533,7 +533,7 @@ async function createColorGroup(parent: SectionNode, groupName: string, shades: 
     swatchFrame.appendChild(rect);
 
     const label = figma.createText();
-    label.fontName = { family: "Inter", style: "Medium" };
+    label.fontName = { family: "Pretendard", style: "Medium" };
     label.fontSize = 12;
     label.characters = shade.name.split("/")[1] || shade.name;
     label.fills = [{ type: "SOLID", color: { r: 0.3, g: 0.3, b: 0.3 } }];
@@ -543,7 +543,7 @@ async function createColorGroup(parent: SectionNode, groupName: string, shades: 
 }
 
 async function createColors(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
 
   let foundationsPage = figma.root.children.find(p => p.name === "Foundations") as PageNode | undefined;
   if (!foundationsPage) { foundationsPage = figma.createPage(); foundationsPage.name = "Foundations"; }
@@ -609,14 +609,14 @@ async function createPropertySection(
   header.fills = [];
 
   const titleText = figma.createText();
-  titleText.fontName = { family: "Inter", style: "Semi Bold" };
+  titleText.fontName = { family: "Pretendard", style: "Semi Bold" };
   titleText.fontSize = 14;
   titleText.characters = title;
   titleText.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
   header.appendChild(titleText);
 
   const descText = figma.createText();
-  descText.fontName = { family: "Inter", style: "Regular" };
+  descText.fontName = { family: "Pretendard", style: "Regular" };
   descText.fontSize = 12;
   descText.characters = description;
   descText.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.55 } }];
@@ -653,7 +653,7 @@ async function createValueItem(
   item.fills = [];
 
   const labelText = figma.createText();
-  labelText.fontName = { family: "Inter", style: "Medium" };
+  labelText.fontName = { family: "Pretendard", style: "Medium" };
   labelText.fontSize = 11;
   labelText.characters = label;
   labelText.fills = [{ type: "SOLID", color: { r: 0.45, g: 0.45, b: 0.5 } }];
@@ -702,9 +702,9 @@ function applyVariableToStroke(node: SceneNode & MinimalStrokesMixin, variableNa
 }
 
 async function createButtons(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
 
   let buttonsPage = figma.root.children.find(p => p.name === "Buttons") as PageNode | undefined;
   if (!buttonsPage) { buttonsPage = figma.createPage(); buttonsPage.name = "Buttons"; }
@@ -806,7 +806,7 @@ async function createButtons(colors: { primary: string; secondary: string }) {
 
         // Create text with variable binding
         const text = figma.createText();
-        text.fontName = { family: "Inter", style: "Semi Bold" };
+        text.fontName = { family: "Pretendard", style: "Semi Bold" };
         text.fontSize = size.fontSize;
         text.characters = "Button";
         applyVariableToFill(text, mapping.textVar, mapping.textFallback);
@@ -846,17 +846,19 @@ async function createButtons(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Button";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Buttons allow users to take actions with a single tap.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -906,9 +908,9 @@ Properties:
 // Card Component
 // ═══════════════════════════════════════════════════════════
 async function createCards(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
 
   let cardsPage = figma.root.children.find(p => p.name === "Cards") as PageNode | undefined;
   if (!cardsPage) { cardsPage = figma.createPage(); cardsPage.name = "Cards"; }
@@ -966,7 +968,7 @@ async function createCards(colors: { primary: string; secondary: string }) {
 
       // Card Header
       const header = figma.createText();
-      header.fontName = { family: "Inter", style: "Semi Bold" };
+      header.fontName = { family: "Pretendard", style: "Semi Bold" };
       header.fontSize = size.name === "SM" ? 14 : size.name === "MD" ? 16 : 18;
       header.characters = "Card Title";
       applyVariableToFill(header, "text/primary", { r: 0.07, g: 0.07, b: 0.07 });
@@ -974,7 +976,7 @@ async function createCards(colors: { primary: string; secondary: string }) {
 
       // Card Content
       const content = figma.createText();
-      content.fontName = { family: "Inter", style: "Regular" };
+      content.fontName = { family: "Pretendard", style: "Regular" };
       content.fontSize = size.name === "SM" ? 12 : 14;
       content.characters = "Card description text goes here. This is a sample content.";
       content.resize(size.width - (size.padding * 2), content.height);
@@ -1014,17 +1016,19 @@ async function createCards(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Card";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Cards contain content and actions about a single subject.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -1055,7 +1059,7 @@ Properties:
 // Badge Component
 // ═══════════════════════════════════════════════════════════
 async function createBadges(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
 
   let badgesPage = figma.root.children.find(p => p.name === "Badges") as PageNode | undefined;
   if (!badgesPage) { badgesPage = figma.createPage(); badgesPage.name = "Badges"; }
@@ -1102,7 +1106,7 @@ async function createBadges(colors: { primary: string; secondary: string }) {
       applyVariableToFill(badge, type.bgVar, type.bgFallback);
 
       const text = figma.createText();
-      text.fontName = { family: "Inter", style: "Medium" };
+      text.fontName = { family: "Pretendard", style: "Medium" };
       text.fontSize = size.fontSize;
       text.characters = "Badge";
       applyVariableToFill(text, type.textVar, type.textFallback);
@@ -1140,17 +1144,19 @@ async function createBadges(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Badge";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Badges are used to highlight status or category.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -1181,10 +1187,10 @@ Properties:
 // Input Component
 // ═══════════════════════════════════════════════════════════
 async function createInputs(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let inputsPage = figma.root.children.find(p => p.name === "Inputs") as PageNode | undefined;
   if (!inputsPage) { inputsPage = figma.createPage(); inputsPage.name = "Inputs"; }
@@ -1218,7 +1224,7 @@ async function createInputs(colors: { primary: string; secondary: string }) {
       input.paddingLeft = size.paddingX;
       input.paddingRight = size.paddingX;
       input.resize(280, size.height);
-      input.cornerRadius = 8;
+      input.cornerRadius = 7;
 
       // Background and border based on state
       if (state === "Default") {
@@ -1241,7 +1247,7 @@ async function createInputs(colors: { primary: string; secondary: string }) {
 
       // Placeholder text
       const text = figma.createText();
-      text.fontName = { family: "Inter", style: "Regular" };
+      text.fontName = { family: "Pretendard", style: "Regular" };
       text.fontSize = size.fontSize;
       text.characters = state === "Disabled" ? "Disabled" : "Placeholder";
       applyVariableToFill(text, state === "Disabled" ? "text/disabled" : "text/secondary", { r: 0.64, g: 0.64, b: 0.64 });
@@ -1279,17 +1285,19 @@ async function createInputs(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Input";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Text input fields for user data entry.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -1328,9 +1336,9 @@ Properties:
 // Checkbox Component
 // ═══════════════════════════════════════════════════════════
 async function createCheckboxes(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let checkboxPage = figma.root.children.find(p => p.name === "Checkboxes") as PageNode | undefined;
   if (!checkboxPage) { checkboxPage = figma.createPage(); checkboxPage.name = "Checkboxes"; }
@@ -1358,7 +1366,7 @@ async function createCheckboxes(colors: { primary: string; secondary: string }) 
       const checkbox = figma.createComponent();
       checkbox.name = `State=${state}, Size=${size.name}`;
       checkbox.resize(size.size, size.size);
-      checkbox.cornerRadius = 4;
+      checkbox.cornerRadius = 2;
 
       if (state === "Checked") {
         applyVariableToFill(checkbox, "interactive/primary", primaryRgb);
@@ -1424,17 +1432,19 @@ async function createCheckboxes(colors: { primary: string; secondary: string }) 
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Checkbox";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Checkboxes allow users to select one or more items from a set.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -1465,9 +1475,9 @@ Properties:
 // Radio Component
 // ═══════════════════════════════════════════════════════════
 async function createRadios(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let radioPage = figma.root.children.find(p => p.name === "Radios") as PageNode | undefined;
   if (!radioPage) { radioPage = figma.createPage(); radioPage.name = "Radios"; }
@@ -1550,17 +1560,19 @@ async function createRadios(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Radio";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Radio buttons allow users to select one option from a set.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -1591,9 +1603,9 @@ Properties:
 // Switch Component
 // ═══════════════════════════════════════════════════════════
 async function createSwitches(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let switchPage = figma.root.children.find(p => p.name === "Switches") as PageNode | undefined;
   if (!switchPage) { switchPage = figma.createPage(); switchPage.name = "Switches"; }
@@ -1670,17 +1682,19 @@ async function createSwitches(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Switch";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Switches allow users to toggle between two states.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -1711,9 +1725,9 @@ Properties:
 // Avatar Component
 // ═══════════════════════════════════════════════════════════
 async function createAvatars(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let avatarPage = figma.root.children.find(p => p.name === "Avatars") as PageNode | undefined;
   if (!avatarPage) { avatarPage = figma.createPage(); avatarPage.name = "Avatars"; }
@@ -1746,7 +1760,7 @@ async function createAvatars(colors: { primary: string; secondary: string }) {
 
     // Initials
     const text = figma.createText();
-    text.fontName = { family: "Inter", style: "Semi Bold" };
+    text.fontName = { family: "Pretendard", style: "Semi Bold" };
     text.fontSize = size.fontSize;
     text.characters = "AB";
     text.textAlignHorizontal = "CENTER";
@@ -1785,17 +1799,19 @@ async function createAvatars(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Avatar";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Avatars represent users or entities.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -1820,10 +1836,10 @@ Properties:
 // Label Component
 // ═══════════════════════════════════════════════════════════
 async function createLabels(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let labelPage = figma.root.children.find(p => p.name === "Labels") as PageNode | undefined;
   if (!labelPage) { labelPage = figma.createPage(); labelPage.name = "Labels"; }
@@ -1855,7 +1871,7 @@ async function createLabels(colors: { primary: string; secondary: string }) {
       label.fills = [];
 
       const text = figma.createText();
-      text.fontName = { family: "Inter", style: state === "Required" ? "Medium" : "Regular" };
+      text.fontName = { family: "Pretendard", style: state === "Required" ? "Medium" : "Regular" };
       text.fontSize = size.fontSize;
       text.characters = "Label";
 
@@ -1870,7 +1886,7 @@ async function createLabels(colors: { primary: string; secondary: string }) {
       // Add asterisk for required
       if (state === "Required") {
         const asterisk = figma.createText();
-        asterisk.fontName = { family: "Inter", style: "Medium" };
+        asterisk.fontName = { family: "Pretendard", style: "Medium" };
         asterisk.fontSize = size.fontSize;
         asterisk.characters = "*";
         applyVariableToFill(asterisk, "text/danger", { r: 0.86, g: 0.20, b: 0.20 });
@@ -1908,17 +1924,19 @@ async function createLabels(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Label";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Text labels for form fields and UI elements.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -1949,10 +1967,10 @@ Properties:
 // Link Component
 // ═══════════════════════════════════════════════════════════
 async function createLinks(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let linkPage = figma.root.children.find(p => p.name === "Links") as PageNode | undefined;
   if (!linkPage) { linkPage = figma.createPage(); linkPage.name = "Links"; }
@@ -1985,7 +2003,7 @@ async function createLinks(colors: { primary: string; secondary: string }) {
       link.fills = [];
 
       const text = figma.createText();
-      text.fontName = { family: "Inter", style: "Medium" };
+      text.fontName = { family: "Pretendard", style: "Medium" };
       text.fontSize = size.fontSize;
       text.characters = "Link";
       text.textDecoration = state === "Default" || state === "Hover" ? "UNDERLINE" : "NONE";
@@ -2031,17 +2049,19 @@ async function createLinks(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Link";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Hyperlinks for navigation and actions.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -2072,9 +2092,9 @@ Properties:
 // Textarea Component
 // ═══════════════════════════════════════════════════════════
 async function createTextareas(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let textareaPage = figma.root.children.find(p => p.name === "Textareas") as PageNode | undefined;
   if (!textareaPage) { textareaPage = figma.createPage(); textareaPage.name = "Textareas"; }
@@ -2133,7 +2153,7 @@ async function createTextareas(colors: { primary: string; secondary: string }) {
 
       // Placeholder text
       const text = figma.createText();
-      text.fontName = { family: "Inter", style: "Regular" };
+      text.fontName = { family: "Pretendard", style: "Regular" };
       text.fontSize = size.fontSize;
       text.characters = state === "Disabled" ? "Disabled" : "Enter text...";
       applyVariableToFill(text, state === "Disabled" ? "text/disabled" : "text/secondary", { r: 0.64, g: 0.64, b: 0.64 });
@@ -2170,17 +2190,19 @@ async function createTextareas(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Textarea";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Multi-line text input fields for longer content.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -2211,9 +2233,9 @@ Properties:
 // Progress Bar Component
 // ═══════════════════════════════════════════════════════════
 async function createProgressBars(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let progressPage = figma.root.children.find(p => p.name === "Progress") as PageNode | undefined;
   if (!progressPage) { progressPage = figma.createPage(); progressPage.name = "Progress"; }
@@ -2286,17 +2308,19 @@ async function createProgressBars(colors: { primary: string; secondary: string }
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Progress";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Progress indicators show completion status.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -2327,9 +2351,9 @@ Properties:
 // Skeleton Component
 // ═══════════════════════════════════════════════════════════
 async function createSkeletons(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let skeletonPage = figma.root.children.find(p => p.name === "Skeletons") as PageNode | undefined;
   if (!skeletonPage) { skeletonPage = figma.createPage(); skeletonPage.name = "Skeletons"; }
@@ -2398,17 +2422,19 @@ async function createSkeletons(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Skeleton";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Skeleton loaders indicate content is loading.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -2439,9 +2465,9 @@ Properties:
 // Slider Component
 // ═══════════════════════════════════════════════════════════
 async function createSliders(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let sliderPage = figma.root.children.find(p => p.name === "Sliders") as PageNode | undefined;
   if (!sliderPage) { sliderPage = figma.createPage(); sliderPage.name = "Sliders"; }
@@ -2532,17 +2558,19 @@ async function createSliders(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Slider";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Sliders allow users to select a value from a range.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -2573,10 +2601,10 @@ Properties:
 // Toggle (Segmented Control) Component
 // ═══════════════════════════════════════════════════════════
 async function createToggles(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let togglePage = figma.root.children.find(p => p.name === "Toggles") as PageNode | undefined;
   if (!togglePage) { togglePage = figma.createPage(); togglePage.name = "Toggles"; }
@@ -2635,7 +2663,7 @@ async function createToggles(colors: { primary: string; secondary: string }) {
         }
 
         const text = figma.createText();
-        text.fontName = { family: "Inter", style: i === 0 ? "Medium" : "Regular" };
+        text.fontName = { family: "Pretendard", style: i === 0 ? "Medium" : "Regular" };
         text.fontSize = size.fontSize;
         text.characters = i === 0 ? "Option 1" : `Option ${i + 1}`;
         applyVariableToFill(text, i === 0 ? "text/primary" : "text/secondary", i === 0 ? { r: 0.1, g: 0.1, b: 0.12 } : { r: 0.5, g: 0.5, b: 0.5 });
@@ -2674,17 +2702,19 @@ async function createToggles(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Toggle (Segmented Control)";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Segmented controls allow users to switch between multiple options.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -2715,10 +2745,10 @@ Properties:
 // Chip Component
 // ═══════════════════════════════════════════════════════════
 async function createChips(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let chipPage = figma.root.children.find(p => p.name === "Chips") as PageNode | undefined;
   if (!chipPage) { chipPage = figma.createPage(); chipPage.name = "Chips"; }
@@ -2762,7 +2792,7 @@ async function createChips(colors: { primary: string; secondary: string }) {
       }
 
       const text = figma.createText();
-      text.fontName = { family: "Inter", style: "Medium" };
+      text.fontName = { family: "Pretendard", style: "Medium" };
       text.fontSize = size.fontSize;
       text.characters = "Chip";
       applyVariableToFill(text, state === "Selected" ? "text/on-color" : "text/secondary", state === "Selected" ? { r: 1, g: 1, b: 1 } : { r: 0.4, g: 0.4, b: 0.4 });
@@ -2799,17 +2829,19 @@ async function createChips(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Chip";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Chips represent small blocks of information or selections.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -2840,9 +2872,9 @@ Properties:
 // Separator Component
 // ═══════════════════════════════════════════════════════════
 async function createSeparators(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let separatorPage = figma.root.children.find(p => p.name === "Separators") as PageNode | undefined;
   if (!separatorPage) { separatorPage = figma.createPage(); separatorPage.name = "Separators"; }
@@ -2907,17 +2939,19 @@ async function createSeparators(colors: { primary: string; secondary: string }) 
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Separator";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Separators visually divide content into clear groups.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -2948,9 +2982,9 @@ Properties:
 // Spinner Component
 // ═══════════════════════════════════════════════════════════
 async function createSpinners(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let spinnerPage = figma.root.children.find(p => p.name === "Spinners") as PageNode | undefined;
   if (!spinnerPage) { spinnerPage = figma.createPage(); spinnerPage.name = "Spinners"; }
@@ -3020,17 +3054,19 @@ async function createSpinners(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Spinner";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Spinners indicate loading or processing states.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -3055,9 +3091,9 @@ Properties:
 // Alert Component
 // ═══════════════════════════════════════════════════════════
 async function createAlerts(colors: { primary: string; secondary: string }) {
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
 
   let alertPage = figma.root.children.find(p => p.name === "Alerts") as PageNode | undefined;
   if (!alertPage) { alertPage = figma.createPage(); alertPage.name = "Alerts"; }
@@ -3100,7 +3136,7 @@ async function createAlerts(colors: { primary: string; secondary: string }) {
 
     // Title
     const title = figma.createText();
-    title.fontName = { family: "Inter", style: "Semi Bold" };
+    title.fontName = { family: "Pretendard", style: "Semi Bold" };
     title.fontSize = 14;
     title.characters = type.name;
     applyVariableToFill(title, type.textVar, type.textFallback);
@@ -3108,7 +3144,7 @@ async function createAlerts(colors: { primary: string; secondary: string }) {
 
     // Message
     const message = figma.createText();
-    message.fontName = { family: "Inter", style: "Regular" };
+    message.fontName = { family: "Pretendard", style: "Regular" };
     message.fontSize = 13;
     message.characters = "This is an alert message.";
     message.resize(368, message.height);
@@ -3146,17 +3182,19 @@ async function createAlerts(colors: { primary: string; secondary: string }) {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Alert";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "Alerts display important messages to users.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -3181,10 +3219,10 @@ async function createIcons() {
   sendStatus("Creating icons...");
 
   // Load fonts
-  await figma.loadFontAsync({ family: "Inter", style: "Regular" });
-  await figma.loadFontAsync({ family: "Inter", style: "Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Semi Bold" });
-  await figma.loadFontAsync({ family: "Inter", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Semi Bold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
 
   const iconsPage = figma.root.findOne(node => node.name === "Icons" && node.type === "PAGE") as PageNode;
   if (!iconsPage) {
@@ -3217,17 +3255,19 @@ async function createIcons() {
   titleFrame.fills = [];
 
   const mainTitle = figma.createText();
-  mainTitle.fontName = { family: "Inter", style: "Bold" };
-  mainTitle.fontSize = 32;
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
   mainTitle.characters = "Icons";
-  mainTitle.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.12 } }];
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainTitle);
 
   const mainDesc = figma.createText();
-  mainDesc.fontName = { family: "Inter", style: "Regular" };
-  mainDesc.fontSize = 16;
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
   mainDesc.characters = "System icons for interface elements and actions.";
-  mainDesc.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.45 } }];
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
@@ -3270,14 +3310,14 @@ async function createIcons() {
     header.fills = [];
 
     const titleText = figma.createText();
-    titleText.fontName = { family: "Inter", style: "Semi Bold" };
+    titleText.fontName = { family: "Pretendard", style: "Semi Bold" };
     titleText.fontSize = 14;
     titleText.characters = `${sizeLabel} (${icons.length} icons)`;
     titleText.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
     header.appendChild(titleText);
 
     const descText = figma.createText();
-    descText.fontName = { family: "Inter", style: "Regular" };
+    descText.fontName = { family: "Pretendard", style: "Regular" };
     descText.fontSize = 12;
     descText.characters = sizeDescriptions[sizeLabel] || "";
     descText.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.55 } }];
@@ -3318,7 +3358,7 @@ async function createIcons() {
 
         // Create label
         const labelText = figma.createText();
-        labelText.fontName = { family: "Inter", style: "Regular" };
+        labelText.fontName = { family: "Pretendard", style: "Regular" };
         labelText.fontSize = 9;
         const cleanName = iconData.name.replace(`${sizeLabel}-`, '').replace('weather-', '');
         labelText.characters = cleanName.length > 10 ? cleanName.substring(0, 9) + '...' : cleanName;
