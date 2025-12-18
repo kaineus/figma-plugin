@@ -32,6 +32,29 @@ function darken(color: RGB, amount: number): RGB {
   };
 }
 
+// Helper function to find Atoms component by name and variant properties
+async function findAtomComponent(pageName: string, componentName: string, variantProps?: Record<string, string>): Promise<ComponentNode | null> {
+  const page = figma.root.children.find(p => p.name === pageName) as PageNode | undefined;
+  if (!page) return null;
+
+  const componentSet = page.findOne(n => n.type === "COMPONENT_SET" && n.name === componentName) as ComponentSetNode | null;
+  if (!componentSet) return null;
+
+  if (variantProps) {
+    // Find specific variant by matching all properties
+    const variant = componentSet.findOne(n => {
+      if (n.type !== "COMPONENT") return false;
+      const component = n as ComponentNode;
+      return Object.entries(variantProps).every(([key, value]) => {
+        return component.name.includes(`${key}=${value}`);
+      });
+    }) as ComponentNode | null;
+    return variant;
+  }
+
+  return componentSet.defaultVariant as ComponentNode;
+}
+
 const LIGHT_BG: Paint = { type: "SOLID", color: { r: 0.98, g: 0.98, b: 0.99 } };
 
 async function createAnnotation(text: string, x: number, y: number, parent: SceneNode & ChildrenMixin): Promise<FrameNode> {
@@ -3255,8 +3278,53 @@ async function createTooltips(colors: { primary: string; secondary: string }) {
       container.counterAxisSizingMode = "AUTO";
       container.primaryAxisAlignItems = "CENTER";
       container.counterAxisAlignItems = "CENTER";
-      container.itemSpacing = 0;
+      container.itemSpacing = 8;
       container.fills = [];
+
+      // Trigger button - use Button Atom instance
+      const triggerButtonComponent = await findAtomComponent("Buttons", "Button", {
+        Type: "Secondary",
+        State: "Default",
+        Size: size.name
+      });
+
+      let trigger: SceneNode;
+      if (triggerButtonComponent) {
+        trigger = triggerButtonComponent.createInstance();
+        trigger.name = "Trigger";
+      } else {
+        // Fallback: create simple button
+        const fallbackTrigger = figma.createFrame();
+        fallbackTrigger.name = "Trigger";
+        fallbackTrigger.layoutMode = "HORIZONTAL";
+        fallbackTrigger.primaryAxisSizingMode = "AUTO";
+        fallbackTrigger.counterAxisSizingMode = "AUTO";
+        fallbackTrigger.paddingLeft = 12;
+        fallbackTrigger.paddingRight = 12;
+        fallbackTrigger.paddingTop = 8;
+        fallbackTrigger.paddingBottom = 8;
+        fallbackTrigger.cornerRadius = 6;
+        fallbackTrigger.fills = [{ type: "SOLID", color: { r: 0.95, g: 0.95, b: 0.95 } }];
+
+        const triggerText = figma.createText();
+        triggerText.fontName = { family: "Pretendard", style: "Medium" };
+        triggerText.fontSize = 14;
+        triggerText.characters = "Hover me";
+        triggerText.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+        fallbackTrigger.appendChild(triggerText);
+        trigger = fallbackTrigger;
+      }
+
+      // Tooltip group (arrow + bubble)
+      const tooltipGroup = figma.createFrame();
+      tooltipGroup.name = "Tooltip";
+      tooltipGroup.layoutMode = position === "Left" || position === "Right" ? "HORIZONTAL" : "VERTICAL";
+      tooltipGroup.primaryAxisSizingMode = "AUTO";
+      tooltipGroup.counterAxisSizingMode = "AUTO";
+      tooltipGroup.primaryAxisAlignItems = "CENTER";
+      tooltipGroup.counterAxisAlignItems = "CENTER";
+      tooltipGroup.itemSpacing = 0;
+      tooltipGroup.fills = [];
 
       // Tooltip bubble
       const bubble = figma.createFrame();
@@ -3274,7 +3342,7 @@ async function createTooltips(colors: { primary: string; secondary: string }) {
       const text = figma.createText();
       text.fontName = { family: "Pretendard", style: "Medium" };
       text.fontSize = size.fontSize;
-      text.characters = "Tooltip";
+      text.characters = "Tooltip text";
       text.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
       bubble.appendChild(text);
 
@@ -3284,22 +3352,30 @@ async function createTooltips(colors: { primary: string; secondary: string }) {
       arrow.resize(size.arrowSize, size.arrowSize);
       arrow.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
 
-      // Rotate arrow based on position
+      // Assemble tooltip group and container based on position
       if (position === "Top") {
         arrow.rotation = 180;
-        container.appendChild(arrow);
-        container.appendChild(bubble);
+        tooltipGroup.appendChild(bubble);
+        tooltipGroup.appendChild(arrow);
+        container.appendChild(tooltipGroup);
+        container.appendChild(trigger);
       } else if (position === "Bottom") {
-        container.appendChild(bubble);
-        container.appendChild(arrow);
+        tooltipGroup.appendChild(arrow);
+        tooltipGroup.appendChild(bubble);
+        container.appendChild(trigger);
+        container.appendChild(tooltipGroup);
       } else if (position === "Left") {
         arrow.rotation = 90;
-        container.appendChild(arrow);
-        container.appendChild(bubble);
+        tooltipGroup.appendChild(bubble);
+        tooltipGroup.appendChild(arrow);
+        container.appendChild(tooltipGroup);
+        container.appendChild(trigger);
       } else { // Right
         arrow.rotation = -90;
-        container.appendChild(bubble);
-        container.appendChild(arrow);
+        tooltipGroup.appendChild(arrow);
+        tooltipGroup.appendChild(bubble);
+        container.appendChild(trigger);
+        container.appendChild(tooltipGroup);
       }
 
       components.push(container);
@@ -3391,55 +3467,80 @@ async function createPagination(colors: { primary: string; secondary: string }) 
 
   const primaryRgb = hexToRgb(colors.primary);
 
-  const states = ["Default", "Active", "Disabled"];
+  const types = ["Simple", "Numbers", "Complete"];
   const sizes = [
-    { name: "SM", size: 32, fontSize: 12 },
-    { name: "MD", size: 40, fontSize: 14 },
-    { name: "LG", size: 48, fontSize: 16 },
+    { name: "SM", buttonSize: 32, fontSize: 12, spacing: 4 },
+    { name: "MD", buttonSize: 40, fontSize: 14, spacing: 6 },
+    { name: "LG", buttonSize: 48, fontSize: 16, spacing: 8 },
   ];
 
   const components: ComponentNode[] = [];
   const paginationMap: Record<string, ComponentNode> = {};
 
-  for (const state of states) {
+  // Helper function to create a page button
+  const createPageButton = (label: string, isActive: boolean, size: typeof sizes[0]) => {
+    const btn = figma.createFrame();
+    btn.name = label;
+    btn.layoutMode = "HORIZONTAL";
+    btn.primaryAxisSizingMode = "FIXED";
+    btn.counterAxisSizingMode = "FIXED";
+    btn.primaryAxisAlignItems = "CENTER";
+    btn.counterAxisAlignItems = "CENTER";
+    btn.resize(size.buttonSize, size.buttonSize);
+    btn.cornerRadius = 4;
+
+    if (isActive) {
+      applyVariableToFill(btn, "interactive/primary", primaryRgb);
+    } else {
+      applyVariableToFill(btn, "bg/primary", { r: 1, g: 1, b: 1 });
+      applyVariableToStroke(btn, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+      btn.strokeWeight = 1;
+    }
+
+    const text = figma.createText();
+    text.fontName = { family: "Pretendard", style: isActive ? "Medium" : "Regular" };
+    text.fontSize = size.fontSize;
+    text.characters = label;
+    text.fills = [{ type: "SOLID", color: isActive ? { r: 1, g: 1, b: 1 } : { r: 0.2, g: 0.2, b: 0.2 } }];
+    btn.appendChild(text);
+
+    return btn;
+  };
+
+  for (const type of types) {
     for (const size of sizes) {
-      const pageBtn = figma.createComponent();
-      pageBtn.name = `State=${state}, Size=${size.name}`;
-      pageBtn.layoutMode = "HORIZONTAL";
-      pageBtn.primaryAxisSizingMode = "FIXED";
-      pageBtn.counterAxisSizingMode = "FIXED";
-      pageBtn.counterAxisAlignItems = "CENTER";
-      pageBtn.primaryAxisAlignItems = "CENTER";
-      pageBtn.resize(size.size, size.size);
-      pageBtn.cornerRadius = 4;
+      const pagination = figma.createComponent();
+      pagination.name = `Type=${type}, Size=${size.name}`;
+      pagination.layoutMode = "HORIZONTAL";
+      pagination.primaryAxisSizingMode = "AUTO";
+      pagination.counterAxisSizingMode = "AUTO";
+      pagination.primaryAxisAlignItems = "CENTER";
+      pagination.counterAxisAlignItems = "CENTER";
+      pagination.itemSpacing = size.spacing;
+      pagination.fills = [];
 
-      if (state === "Active") {
-        applyVariableToFill(pageBtn, "interactive/primary", primaryRgb);
-      } else if (state === "Disabled") {
-        applyVariableToFill(pageBtn, "bg/secondary", { r: 0.96, g: 0.96, b: 0.96 });
-      } else {
-        applyVariableToFill(pageBtn, "bg/primary", { r: 1, g: 1, b: 1 });
-        applyVariableToStroke(pageBtn, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
-        pageBtn.strokeWeight = 1;
+      if (type === "Simple") {
+        // [< Previous] [Next >]
+        pagination.appendChild(createPageButton("<", false, size));
+        pagination.appendChild(createPageButton(">", false, size));
+      } else if (type === "Numbers") {
+        // [1] [2] [3] [4] [5]
+        for (let i = 1; i <= 5; i++) {
+          pagination.appendChild(createPageButton(String(i), i === 2, size));
+        }
+      } else { // Complete
+        // [< Previous] [1] [2] [3] [...] [10] [Next >]
+        pagination.appendChild(createPageButton("<", false, size));
+        pagination.appendChild(createPageButton("1", false, size));
+        pagination.appendChild(createPageButton("2", true, size));
+        pagination.appendChild(createPageButton("3", false, size));
+        pagination.appendChild(createPageButton("...", false, size));
+        pagination.appendChild(createPageButton("10", false, size));
+        pagination.appendChild(createPageButton(">", false, size));
       }
 
-      const text = figma.createText();
-      text.fontName = { family: "Pretendard", style: state === "Active" ? "Medium" : "Regular" };
-      text.fontSize = size.fontSize;
-      text.characters = "1";
-
-      if (state === "Active") {
-        text.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
-      } else if (state === "Disabled") {
-        applyVariableToFill(text, "text/disabled", { r: 0.7, g: 0.7, b: 0.7 });
-      } else {
-        applyVariableToFill(text, "text/primary", { r: 0.1, g: 0.1, b: 0.1 });
-      }
-
-      pageBtn.appendChild(text);
-
-      components.push(pageBtn);
-      paginationMap[`${state}-${size.name}`] = pageBtn;
+      components.push(pagination);
+      paginationMap[`${type}-${size.name}`] = pagination;
     }
   }
 
@@ -3486,22 +3587,22 @@ async function createPagination(colors: { primary: string; secondary: string }) 
 
   docFrame.appendChild(titleFrame);
 
-  const stateContent = await createPropertySection(docFrame, "State", "Visual states for page numbers.", 0);
-  for (const state of states) {
-    await createValueItem(stateContent, state, paginationMap[`${state}-MD`]);
+  const typeContent = await createPropertySection(docFrame, "Type", "Different pagination layouts.", 0);
+  for (const type of types) {
+    await createValueItem(typeContent, type, paginationMap[`${type}-MD`]);
   }
 
   const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
   for (const size of sizes) {
-    await createValueItem(sizeContent, size.name, paginationMap[`Default-${size.name}`]);
+    await createValueItem(sizeContent, size.name, paginationMap[`Complete-${size.name}`]);
   }
 
   componentSet.description = `Pagination Component
 
-Pagination allows users to navigate through pages of content.
+Complete pagination UI with navigation buttons and page numbers.
 
 Properties:
-• State: Default, Active, Disabled
+• Type: Simple (prev/next), Numbers (page numbers), Complete (full navigation)
 • Size: SM (32px), MD (40px), LG (48px)`;
 
   figma.viewport.scrollAndZoomIntoView([docFrame]);
@@ -3830,44 +3931,72 @@ async function createModals(colors: { primary: string; secondary: string }) {
         footer.fills = [];
 
         if (actionType === "Double") {
-          // Cancel button
-          const cancelButton = figma.createFrame();
-          cancelButton.name = "Cancel";
-          cancelButton.resize(size.buttonWidth, size.buttonHeight);
-          cancelButton.layoutMode = "HORIZONTAL";
-          cancelButton.primaryAxisAlignItems = "CENTER";
-          cancelButton.counterAxisAlignItems = "CENTER";
-          cancelButton.cornerRadius = 8;
-          cancelButton.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
-          cancelButton.strokes = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
-          cancelButton.strokeWeight = 1;
+          // Cancel button - use Button Atom instance
+          const cancelButtonComponent = await findAtomComponent("Buttons", "Button", {
+            Type: "Secondary",
+            State: "Default",
+            Size: "MD"
+          });
 
-          const cancelText = figma.createText();
-          cancelText.fontName = { family: "Pretendard", style: "Bold" };
-          cancelText.fontSize = 14;
-          cancelText.characters = "Cancel";
-          cancelText.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.55 } }];
-          cancelButton.appendChild(cancelText);
-          footer.appendChild(cancelButton);
+          if (cancelButtonComponent) {
+            const cancelButton = cancelButtonComponent.createInstance();
+            cancelButton.name = "Cancel Button";
+            cancelButton.resize(size.buttonWidth, size.buttonHeight);
+            footer.appendChild(cancelButton);
+          } else {
+            // Fallback: create manually if Button component doesn't exist
+            const cancelButton = figma.createFrame();
+            cancelButton.name = "Cancel";
+            cancelButton.resize(size.buttonWidth, size.buttonHeight);
+            cancelButton.layoutMode = "HORIZONTAL";
+            cancelButton.primaryAxisAlignItems = "CENTER";
+            cancelButton.counterAxisAlignItems = "CENTER";
+            cancelButton.cornerRadius = 8;
+            cancelButton.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+            cancelButton.strokes = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.9 } }];
+            cancelButton.strokeWeight = 1;
+
+            const cancelText = figma.createText();
+            cancelText.fontName = { family: "Pretendard", style: "Bold" };
+            cancelText.fontSize = 14;
+            cancelText.characters = "Cancel";
+            cancelText.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.55 } }];
+            cancelButton.appendChild(cancelText);
+            footer.appendChild(cancelButton);
+          }
         }
 
-        // Confirm/Submit button
-        const confirmButton = figma.createFrame();
-        confirmButton.name = "Confirm";
-        confirmButton.resize(size.buttonWidth, size.buttonHeight);
-        confirmButton.layoutMode = "HORIZONTAL";
-        confirmButton.primaryAxisAlignItems = "CENTER";
-        confirmButton.counterAxisAlignItems = "CENTER";
-        confirmButton.cornerRadius = 8;
-        applyVariableToFill(confirmButton, "interactive/primary", primaryRgb);
+        // Confirm/Submit button - use Button Atom instance
+        const confirmButtonComponent = await findAtomComponent("Buttons", "Button", {
+          Type: "Primary",
+          State: "Default",
+          Size: "MD"
+        });
 
-        const confirmText = figma.createText();
-        confirmText.fontName = { family: "Pretendard", style: "Bold" };
-        confirmText.fontSize = 14;
-        confirmText.characters = actionType === "Single" ? "OK" : "Confirm";
-        confirmText.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
-        confirmButton.appendChild(confirmText);
-        footer.appendChild(confirmButton);
+        if (confirmButtonComponent) {
+          const confirmButton = confirmButtonComponent.createInstance();
+          confirmButton.name = "Confirm Button";
+          confirmButton.resize(size.buttonWidth, size.buttonHeight);
+          footer.appendChild(confirmButton);
+        } else {
+          // Fallback: create manually if Button component doesn't exist
+          const confirmButton = figma.createFrame();
+          confirmButton.name = "Confirm";
+          confirmButton.resize(size.buttonWidth, size.buttonHeight);
+          confirmButton.layoutMode = "HORIZONTAL";
+          confirmButton.primaryAxisAlignItems = "CENTER";
+          confirmButton.counterAxisAlignItems = "CENTER";
+          confirmButton.cornerRadius = 8;
+          applyVariableToFill(confirmButton, "interactive/primary", primaryRgb);
+
+          const confirmText = figma.createText();
+          confirmText.fontName = { family: "Pretendard", style: "Bold" };
+          confirmText.fontSize = 14;
+          confirmText.characters = actionType === "Single" ? "OK" : "Confirm";
+          confirmText.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+          confirmButton.appendChild(confirmText);
+          footer.appendChild(confirmButton);
+        }
 
         modal.appendChild(footer);
       }
