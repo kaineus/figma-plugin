@@ -3236,37 +3236,75 @@ async function createTooltips(colors: { primary: string; secondary: string }) {
     try { child.remove(); } catch (e) { /* skip */ }
   }
 
+  const positions = ["Top", "Bottom", "Left", "Right"];
   const sizes = [
-    { name: "SM", paddingX: 8, paddingY: 4, fontSize: 11 },
-    { name: "MD", paddingX: 12, paddingY: 6, fontSize: 12 },
-    { name: "LG", paddingX: 16, paddingY: 8, fontSize: 14 },
+    { name: "SM", paddingX: 8, paddingY: 4, fontSize: 11, arrowSize: 6 },
+    { name: "MD", paddingX: 12, paddingY: 6, fontSize: 12, arrowSize: 8 },
+    { name: "LG", paddingX: 16, paddingY: 8, fontSize: 14, arrowSize: 10 },
   ];
 
   const components: ComponentNode[] = [];
   const tooltipMap: Record<string, ComponentNode> = {};
 
-  for (const size of sizes) {
-    const tooltip = figma.createComponent();
-    tooltip.name = `Size=${size.name}`;
-    tooltip.layoutMode = "HORIZONTAL";
-    tooltip.primaryAxisSizingMode = "AUTO";
-    tooltip.counterAxisSizingMode = "AUTO";
-    tooltip.paddingLeft = size.paddingX;
-    tooltip.paddingRight = size.paddingX;
-    tooltip.paddingTop = size.paddingY;
-    tooltip.paddingBottom = size.paddingY;
-    tooltip.cornerRadius = 6;
-    tooltip.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+  for (const position of positions) {
+    for (const size of sizes) {
+      const container = figma.createComponent();
+      container.name = `Position=${position}, Size=${size.name}`;
+      container.layoutMode = position === "Left" || position === "Right" ? "HORIZONTAL" : "VERTICAL";
+      container.primaryAxisSizingMode = "AUTO";
+      container.counterAxisSizingMode = "AUTO";
+      container.primaryAxisAlignItems = "CENTER";
+      container.counterAxisAlignItems = "CENTER";
+      container.itemSpacing = 0;
+      container.fills = [];
 
-    const text = figma.createText();
-    text.fontName = { family: "Pretendard", style: "Medium" };
-    text.fontSize = size.fontSize;
-    text.characters = "Tooltip";
-    text.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
-    tooltip.appendChild(text);
+      // Tooltip bubble
+      const bubble = figma.createFrame();
+      bubble.name = "Bubble";
+      bubble.layoutMode = "HORIZONTAL";
+      bubble.primaryAxisSizingMode = "AUTO";
+      bubble.counterAxisSizingMode = "AUTO";
+      bubble.paddingLeft = size.paddingX;
+      bubble.paddingRight = size.paddingX;
+      bubble.paddingTop = size.paddingY;
+      bubble.paddingBottom = size.paddingY;
+      bubble.cornerRadius = 6;
+      bubble.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
 
-    components.push(tooltip);
-    tooltipMap[size.name] = tooltip;
+      const text = figma.createText();
+      text.fontName = { family: "Pretendard", style: "Medium" };
+      text.fontSize = size.fontSize;
+      text.characters = "Tooltip";
+      text.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      bubble.appendChild(text);
+
+      // Arrow (triangle)
+      const arrow = figma.createPolygon();
+      arrow.name = "Arrow";
+      arrow.resize(size.arrowSize, size.arrowSize);
+      arrow.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+
+      // Rotate arrow based on position
+      if (position === "Top") {
+        arrow.rotation = 180;
+        container.appendChild(arrow);
+        container.appendChild(bubble);
+      } else if (position === "Bottom") {
+        container.appendChild(bubble);
+        container.appendChild(arrow);
+      } else if (position === "Left") {
+        arrow.rotation = 90;
+        container.appendChild(arrow);
+        container.appendChild(bubble);
+      } else { // Right
+        arrow.rotation = -90;
+        container.appendChild(bubble);
+        container.appendChild(arrow);
+      }
+
+      components.push(container);
+      tooltipMap[`${position}-${size.name}`] = container;
+    }
   }
 
   const componentSet = figma.combineAsVariants(components, tooltipPage);
@@ -3282,7 +3320,7 @@ async function createTooltips(colors: { primary: string; secondary: string }) {
   docFrame.primaryAxisSizingMode = "AUTO";
   docFrame.counterAxisSizingMode = "AUTO";
   docFrame.itemSpacing = 32;
-  docFrame.x = 600;
+  docFrame.x = 800;
   docFrame.y = 100;
   docFrame.fills = [];
 
@@ -3306,22 +3344,28 @@ async function createTooltips(colors: { primary: string; secondary: string }) {
   mainDesc.fontName = { family: "Pretendard", style: "Regular" };
   mainDesc.fontSize = 14;
   mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
-  mainDesc.characters = "Tooltips provide helpful hints and additional context.";
+  mainDesc.characters = "Tooltips provide helpful hints with directional arrows.";
   mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
 
+  const posContent = await createPropertySection(docFrame, "Position", "Arrow position for tooltip placement.", 0);
+  for (const pos of positions) {
+    await createValueItem(posContent, pos, tooltipMap[`${pos}-MD`]);
+  }
+
   const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
   for (const size of sizes) {
-    await createValueItem(sizeContent, size.name, tooltipMap[size.name]);
+    await createValueItem(sizeContent, size.name, tooltipMap[`Top-${size.name}`]);
   }
 
   componentSet.description = `Tooltip Component
 
-Tooltips provide helpful hints and additional context.
+Tooltips provide helpful hints with directional arrows.
 
 Properties:
+• Position: Top, Bottom, Left, Right
 • Size: SM, MD, LG`;
 
   figma.viewport.scrollAndZoomIntoView([docFrame]);
@@ -3483,6 +3527,7 @@ async function createTabs(colors: { primary: string; secondary: string }) {
 
   const primaryRgb = hexToRgb(colors.primary);
 
+  const styles = ["Underline", "Boxed", "Pill"];
   const states = ["Default", "Active"];
   const sizes = [
     { name: "SM", paddingX: 12, paddingY: 8, fontSize: 13, borderHeight: 2 },
@@ -3493,46 +3538,67 @@ async function createTabs(colors: { primary: string; secondary: string }) {
   const components: ComponentNode[] = [];
   const tabMap: Record<string, ComponentNode> = {};
 
-  for (const state of states) {
-    for (const size of sizes) {
-      const tab = figma.createComponent();
-      tab.name = `State=${state}, Size=${size.name}`;
-      tab.layoutMode = "VERTICAL";
-      tab.primaryAxisSizingMode = "AUTO";
-      tab.counterAxisSizingMode = "AUTO";
-      tab.paddingLeft = size.paddingX;
-      tab.paddingRight = size.paddingX;
-      tab.paddingTop = size.paddingY;
-      tab.paddingBottom = size.paddingY;
-      tab.fills = [];
+  for (const style of styles) {
+    for (const state of states) {
+      for (const size of sizes) {
+        const tab = figma.createComponent();
+        tab.name = `Style=${style}, State=${state}, Size=${size.name}`;
+        tab.layoutMode = "HORIZONTAL";
+        tab.primaryAxisSizingMode = "AUTO";
+        tab.counterAxisSizingMode = "AUTO";
+        tab.paddingLeft = size.paddingX;
+        tab.paddingRight = size.paddingX;
+        tab.paddingTop = size.paddingY;
+        tab.paddingBottom = size.paddingY;
 
-      const text = figma.createText();
-      text.fontName = { family: "Pretendard", style: state === "Active" ? "Medium" : "Regular" };
-      text.fontSize = size.fontSize;
-      text.characters = "Tab";
+        const text = figma.createText();
+        text.fontName = { family: "Pretendard", style: state === "Active" ? "Medium" : "Regular" };
+        text.fontSize = size.fontSize;
+        text.characters = "Tab";
 
-      if (state === "Active") {
-        applyVariableToFill(text, "text/brand", primaryRgb);
-      } else {
-        applyVariableToFill(text, "text/secondary", { r: 0.5, g: 0.5, b: 0.5 });
+        // Style-specific design
+        if (style === "Underline") {
+          tab.fills = [];
+          if (state === "Active") {
+            applyVariableToFill(text, "text/brand", primaryRgb);
+            tab.strokeWeight = size.borderHeight;
+            tab.strokeAlign = "INSIDE";
+            tab.strokes = [{ type: "SOLID", color: primaryRgb }];
+            tab.strokeTopWeight = 0;
+            tab.strokeRightWeight = 0;
+            tab.strokeLeftWeight = 0;
+            tab.strokeBottomWeight = size.borderHeight;
+          } else {
+            applyVariableToFill(text, "text/secondary", { r: 0.5, g: 0.5, b: 0.5 });
+          }
+        } else if (style === "Boxed") {
+          tab.cornerRadius = 6;
+          if (state === "Active") {
+            applyVariableToFill(tab, "bg/brand-subtle", lighten(primaryRgb, 0.9));
+            applyVariableToFill(text, "text/brand", primaryRgb);
+            applyVariableToStroke(tab, "border/brand", primaryRgb);
+            tab.strokeWeight = 1;
+          } else {
+            tab.fills = [];
+            applyVariableToFill(text, "text/secondary", { r: 0.5, g: 0.5, b: 0.5 });
+            tab.strokes = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.9 } }];
+            tab.strokeWeight = 1;
+          }
+        } else { // Pill
+          tab.cornerRadius = 999;
+          if (state === "Active") {
+            applyVariableToFill(tab, "interactive/primary", primaryRgb);
+            text.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+          } else {
+            applyVariableToFill(tab, "bg/secondary", { r: 0.95, g: 0.95, b: 0.95 });
+            applyVariableToFill(text, "text/secondary", { r: 0.5, g: 0.5, b: 0.5 });
+          }
+        }
+
+        tab.appendChild(text);
+        components.push(tab);
+        tabMap[`${style}-${state}-${size.name}`] = tab;
       }
-
-      tab.appendChild(text);
-
-      // Bottom border for active state
-      if (state === "Active") {
-        tab.strokeWeight = size.borderHeight;
-        tab.strokeAlign = "INSIDE";
-        tab.strokes = [{ type: "SOLID", color: primaryRgb }];
-        // Only bottom border using individual stroke weights
-        tab.strokeTopWeight = 0;
-        tab.strokeRightWeight = 0;
-        tab.strokeLeftWeight = 0;
-        tab.strokeBottomWeight = size.borderHeight;
-      }
-
-      components.push(tab);
-      tabMap[`${state}-${size.name}`] = tab;
     }
   }
 
@@ -3549,7 +3615,7 @@ async function createTabs(colors: { primary: string; secondary: string }) {
   docFrame.primaryAxisSizingMode = "AUTO";
   docFrame.counterAxisSizingMode = "AUTO";
   docFrame.itemSpacing = 32;
-  docFrame.x = 600;
+  docFrame.x = 800;
   docFrame.y = 100;
   docFrame.fills = [];
 
@@ -3573,27 +3639,33 @@ async function createTabs(colors: { primary: string; secondary: string }) {
   mainDesc.fontName = { family: "Pretendard", style: "Regular" };
   mainDesc.fontSize = 14;
   mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
-  mainDesc.characters = "Tabs organize content into separate views where only one view is visible at a time.";
+  mainDesc.characters = "Tabs in multiple styles: Underline, Boxed, and Pill.";
   mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
   docFrame.appendChild(titleFrame);
 
+  const styleContent = await createPropertySection(docFrame, "Style", "Visual styles for tab design.", 0);
+  for (const style of styles) {
+    await createValueItem(styleContent, style, tabMap[`${style}-Active-MD`]);
+  }
+
   const stateContent = await createPropertySection(docFrame, "State", "Visual states for tab items.", 0);
   for (const state of states) {
-    await createValueItem(stateContent, state, tabMap[`${state}-MD`]);
+    await createValueItem(stateContent, state, tabMap[`Underline-${state}-MD`]);
   }
 
   const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
   for (const size of sizes) {
-    await createValueItem(sizeContent, size.name, tabMap[`Default-${size.name}`]);
+    await createValueItem(sizeContent, size.name, tabMap[`Underline-Default-${size.name}`]);
   }
 
   componentSet.description = `Tab Component
 
-Tabs organize content into separate views where only one view is visible at a time.
+Tabs in multiple styles: Underline, Boxed, and Pill.
 
 Properties:
+• Style: Underline, Boxed, Pill
 • State: Default, Active
 • Size: SM, MD, LG`;
 
@@ -3619,82 +3691,179 @@ async function createModals(colors: { primary: string; secondary: string }) {
     try { child.remove(); } catch (e) { /* skip */ }
   }
 
+  const primaryRgb = hexToRgb(colors.primary);
   const sizes = [
-    { name: "SM", width: 400, contentHeight: 120 },
-    { name: "MD", width: 560, contentHeight: 200 },
-    { name: "LG", width: 720, contentHeight: 320 },
+    { name: "SM", width: 400, contentHeight: 100, buttonHeight: 36, buttonWidth: 80 },
+    { name: "MD", width: 560, contentHeight: 160, buttonHeight: 40, buttonWidth: 100 },
+    { name: "LG", width: 720, contentHeight: 240, buttonHeight: 44, buttonWidth: 120 },
   ];
+  const actionTypes = ["None", "Single", "Double"];
 
   const components: ComponentNode[] = [];
   const modalMap: Record<string, ComponentNode> = {};
 
   for (const size of sizes) {
-    const modal = figma.createComponent();
-    modal.name = `Size=${size.name}`;
-    modal.layoutMode = "VERTICAL";
-    modal.primaryAxisSizingMode = "FIXED";
-    modal.counterAxisSizingMode = "AUTO";
-    modal.resize(size.width, 100);
-    modal.paddingTop = 24;
-    modal.paddingBottom = 24;
-    modal.paddingLeft = 24;
-    modal.paddingRight = 24;
-    modal.itemSpacing = 20;
-    modal.cornerRadius = 12;
-    modal.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
-    modal.strokes = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.9 } }];
-    modal.strokeWeight = 1;
-    modal.effects = [{
-      type: "DROP_SHADOW",
-      color: { r: 0, g: 0, b: 0, a: 0.1 },
-      offset: { x: 0, y: 4 },
-      radius: 12,
-      visible: true,
-      blendMode: "NORMAL"
-    }];
+    for (const actionType of actionTypes) {
+      // Create backdrop + modal container
+      const container = figma.createComponent();
+      container.name = `Size=${size.name}, Actions=${actionType}`;
+      container.layoutMode = "NONE";
+      container.resize(size.width + 200, size.contentHeight + 300);
+      container.fills = [];
 
-    // Header
-    const header = figma.createFrame();
-    header.name = "Header";
-    header.layoutMode = "HORIZONTAL";
-    header.primaryAxisSizingMode = "FIXED";
-    header.counterAxisSizingMode = "AUTO";
-    header.primaryAxisAlignItems = "SPACE_BETWEEN";
-    header.counterAxisAlignItems = "CENTER";
-    header.resize(size.width - 48, 28);
-    header.fills = [];
+      // Backdrop (semi-transparent overlay)
+      const backdrop = figma.createFrame();
+      backdrop.name = "Backdrop";
+      backdrop.resize(size.width + 200, size.contentHeight + 300);
+      backdrop.fills = [{ type: "SOLID", color: { r: 0, g: 0, b: 0 }, opacity: 0.4 }];
+      backdrop.x = 0;
+      backdrop.y = 0;
+      container.appendChild(backdrop);
 
-    const title = figma.createText();
-    title.fontName = { family: "Pretendard", style: "SemiBold" };
-    title.fontSize = 18;
-    title.characters = "Modal Title";
-    title.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.1 } }];
-    header.appendChild(title);
+      // Modal box
+      const modal = figma.createFrame();
+      modal.name = "Modal";
+      modal.layoutMode = "VERTICAL";
+      modal.primaryAxisSizingMode = "AUTO";
+      modal.counterAxisSizingMode = "FIXED";
+      modal.resize(size.width, 100);
+      modal.paddingTop = 20;
+      modal.paddingBottom = 20;
+      modal.paddingLeft = 24;
+      modal.paddingRight = 24;
+      modal.itemSpacing = 16;
+      modal.cornerRadius = 12;
+      modal.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      modal.effects = [{
+        type: "DROP_SHADOW",
+        color: { r: 0, g: 0, b: 0, a: 0.2 },
+        offset: { x: 0, y: 8 },
+        radius: 24,
+        visible: true,
+        blendMode: "NORMAL"
+      }];
 
-    modal.appendChild(header);
+      // Center modal
+      modal.x = (size.width + 200 - size.width) / 2;
+      modal.y = (size.contentHeight + 300 - (size.contentHeight + 150)) / 2;
+      container.appendChild(modal);
 
-    // Content
-    const content = figma.createFrame();
-    content.name = "Content";
-    content.layoutMode = "VERTICAL";
-    content.primaryAxisSizingMode = "FIXED";
-    content.counterAxisSizingMode = "FIXED";
-    content.resize(size.width - 48, size.contentHeight);
-    content.fills = [];
+      // Header with title and close button
+      const header = figma.createFrame();
+      header.name = "Header";
+      header.layoutMode = "HORIZONTAL";
+      header.primaryAxisSizingMode = "FIXED";
+      header.counterAxisSizingMode = "AUTO";
+      header.primaryAxisAlignItems = "SPACE_BETWEEN";
+      header.counterAxisAlignItems = "CENTER";
+      header.resize(size.width - 48, 28);
+      header.fills = [];
 
-    const bodyText = figma.createText();
-    bodyText.fontName = { family: "Pretendard", style: "Regular" };
-    bodyText.fontSize = 14;
-    bodyText.characters = "Modal content goes here.";
-    bodyText.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
-    bodyText.resize(size.width - 48, bodyText.height);
-    bodyText.textAutoResize = "HEIGHT";
-    content.appendChild(bodyText);
+      const title = figma.createText();
+      title.fontName = { family: "Pretendard", style: "SemiBold" };
+      title.fontSize = 18;
+      title.characters = "Modal Title";
+      title.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.1 } }];
+      header.appendChild(title);
 
-    modal.appendChild(content);
+      // Close button
+      const closeButton = figma.createFrame();
+      closeButton.name = "Close Button";
+      closeButton.resize(24, 24);
+      closeButton.layoutMode = "HORIZONTAL";
+      closeButton.primaryAxisAlignItems = "CENTER";
+      closeButton.counterAxisAlignItems = "CENTER";
+      closeButton.fills = [];
+      closeButton.cornerRadius = 4;
 
-    components.push(modal);
-    modalMap[size.name] = modal;
+      const closeIcon = figma.createText();
+      closeIcon.fontName = { family: "Pretendard", style: "Regular" };
+      closeIcon.fontSize = 20;
+      closeIcon.characters = "×";
+      closeIcon.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+      closeButton.appendChild(closeIcon);
+      header.appendChild(closeButton);
+
+      modal.appendChild(header);
+
+      // Content
+      const content = figma.createFrame();
+      content.name = "Content";
+      content.layoutMode = "VERTICAL";
+      content.primaryAxisSizingMode = "FIXED";
+      content.counterAxisSizingMode = "FIXED";
+      content.resize(size.width - 48, size.contentHeight);
+      content.fills = [];
+
+      const bodyText = figma.createText();
+      bodyText.fontName = { family: "Pretendard", style: "Regular" };
+      bodyText.fontSize = 14;
+      bodyText.lineHeight = { value: 150, unit: "PERCENT" };
+      bodyText.characters = "This is the modal content area. You can place any information, forms, or other content here.";
+      bodyText.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+      bodyText.resize(size.width - 48, bodyText.height);
+      bodyText.textAutoResize = "HEIGHT";
+      content.appendChild(bodyText);
+
+      modal.appendChild(content);
+
+      // Footer with action buttons
+      if (actionType !== "None") {
+        const footer = figma.createFrame();
+        footer.name = "Footer";
+        footer.layoutMode = "HORIZONTAL";
+        footer.primaryAxisSizingMode = "FIXED";
+        footer.counterAxisSizingMode = "AUTO";
+        footer.primaryAxisAlignItems = "MAX";
+        footer.counterAxisAlignItems = "CENTER";
+        footer.resize(size.width - 48, size.buttonHeight);
+        footer.itemSpacing = 12;
+        footer.fills = [];
+
+        if (actionType === "Double") {
+          // Cancel button
+          const cancelButton = figma.createFrame();
+          cancelButton.name = "Cancel";
+          cancelButton.resize(size.buttonWidth, size.buttonHeight);
+          cancelButton.layoutMode = "HORIZONTAL";
+          cancelButton.primaryAxisAlignItems = "CENTER";
+          cancelButton.counterAxisAlignItems = "CENTER";
+          cancelButton.cornerRadius = 6;
+          cancelButton.fills = [{ type: "SOLID", color: { r: 0.95, g: 0.95, b: 0.95 } }];
+
+          const cancelText = figma.createText();
+          cancelText.fontName = { family: "Pretendard", style: "Medium" };
+          cancelText.fontSize = size.name === "SM" ? 13 : size.name === "MD" ? 14 : 15;
+          cancelText.characters = "Cancel";
+          cancelText.fills = [{ type: "SOLID", color: { r: 0.3, g: 0.3, b: 0.3 } }];
+          cancelButton.appendChild(cancelText);
+          footer.appendChild(cancelButton);
+        }
+
+        // Confirm/Submit button
+        const confirmButton = figma.createFrame();
+        confirmButton.name = "Confirm";
+        confirmButton.resize(size.buttonWidth, size.buttonHeight);
+        confirmButton.layoutMode = "HORIZONTAL";
+        confirmButton.primaryAxisAlignItems = "CENTER";
+        confirmButton.counterAxisAlignItems = "CENTER";
+        confirmButton.cornerRadius = 6;
+        applyVariableToFill(confirmButton, "interactive/primary", primaryRgb);
+
+        const confirmText = figma.createText();
+        confirmText.fontName = { family: "Pretendard", style: "Medium" };
+        confirmText.fontSize = size.name === "SM" ? 13 : size.name === "MD" ? 14 : 15;
+        confirmText.characters = actionType === "Single" ? "OK" : "Confirm";
+        confirmText.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+        confirmButton.appendChild(confirmText);
+        footer.appendChild(confirmButton);
+
+        modal.appendChild(footer);
+      }
+
+      components.push(container);
+      modalMap[`${size.name}-${actionType}`] = container;
+    }
   }
 
   const componentSet = figma.combineAsVariants(components, modalPage);
@@ -3710,7 +3879,7 @@ async function createModals(colors: { primary: string; secondary: string }) {
   docFrame.primaryAxisSizingMode = "AUTO";
   docFrame.counterAxisSizingMode = "AUTO";
   docFrame.itemSpacing = 32;
-  docFrame.x = 900;
+  docFrame.x = 3000;
   docFrame.y = 100;
   docFrame.fills = [];
 
@@ -3734,7 +3903,7 @@ async function createModals(colors: { primary: string; secondary: string }) {
   mainDesc.fontName = { family: "Pretendard", style: "Regular" };
   mainDesc.fontSize = 14;
   mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
-  mainDesc.characters = "Modals focus user attention on a specific task or message.";
+  mainDesc.characters = "Modals with backdrop overlay, close button, and action buttons. Focus user attention on specific tasks.";
   mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
   titleFrame.appendChild(mainDesc);
 
@@ -3742,15 +3911,26 @@ async function createModals(colors: { primary: string; secondary: string }) {
 
   const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different content lengths.", 0);
   for (const size of sizes) {
-    await createValueItem(sizeContent, size.name, modalMap[size.name]);
+    await createValueItem(sizeContent, size.name, modalMap[`${size.name}-Double`]);
+  }
+
+  const actionsContent = await createPropertySection(docFrame, "Actions", "Different button configurations.", 1);
+  for (const actionType of actionTypes) {
+    await createValueItem(actionsContent, actionType, modalMap[`MD-${actionType}`]);
   }
 
   componentSet.description = `Modal Component
 
-Modals focus user attention on a specific task or message.
+Modals with backdrop overlay, close button, and action buttons. Focus user attention on specific tasks.
 
 Properties:
-• Size: SM (400px), MD (560px), LG (720px)`;
+• Size: SM (400px), MD (560px), LG (720px)
+• Actions: None, Single (OK button), Double (Cancel + Confirm buttons)
+
+Features:
+• Semi-transparent backdrop overlay
+• Close button (X) in header
+• Configurable action buttons in footer`;
 
   figma.viewport.scrollAndZoomIntoView([docFrame]);
   sendStatus("Modals created! (" + components.length + " variants)", "success");
