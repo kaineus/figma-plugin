@@ -78,6 +78,8 @@ async function createPages() {
     "Inputs",
     "Labels",
     "Links",
+    "Modals",
+    "Pagination",
     "Progress",
     "Radios",
     "Separators",
@@ -85,8 +87,10 @@ async function createPages() {
     "Sliders",
     "Spinners",
     "Switches",
+    "Tabs",
     "Textareas",
     "Toggles",
+    "Tooltips",
     "---",
     "Templates",
     "---",
@@ -3215,6 +3219,543 @@ Properties:
   sendStatus("Alerts created! (" + components.length + " variants)", "success");
 }
 
+// ═══════════════════════════════════════════════════════════
+// Tooltip Component
+// ═══════════════════════════════════════════════════════════
+async function createTooltips(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
+
+  let tooltipPage = figma.root.children.find(p => p.name === "Tooltips") as PageNode | undefined;
+  if (!tooltipPage) { tooltipPage = figma.createPage(); tooltipPage.name = "Tooltips"; }
+  tooltipPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(tooltipPage);
+
+  for (const child of [...tooltipPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const sizes = [
+    { name: "SM", paddingX: 8, paddingY: 4, fontSize: 11 },
+    { name: "MD", paddingX: 12, paddingY: 6, fontSize: 12 },
+    { name: "LG", paddingX: 16, paddingY: 8, fontSize: 14 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const tooltipMap: Record<string, ComponentNode> = {};
+
+  for (const size of sizes) {
+    const tooltip = figma.createComponent();
+    tooltip.name = `Size=${size.name}`;
+    tooltip.layoutMode = "HORIZONTAL";
+    tooltip.primaryAxisSizingMode = "AUTO";
+    tooltip.counterAxisSizingMode = "AUTO";
+    tooltip.paddingLeft = size.paddingX;
+    tooltip.paddingRight = size.paddingX;
+    tooltip.paddingTop = size.paddingY;
+    tooltip.paddingBottom = size.paddingY;
+    tooltip.cornerRadius = 6;
+    tooltip.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+
+    const text = figma.createText();
+    text.fontName = { family: "Pretendard", style: "Medium" };
+    text.fontSize = size.fontSize;
+    text.characters = "Tooltip";
+    text.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+    tooltip.appendChild(text);
+
+    components.push(tooltip);
+    tooltipMap[size.name] = tooltip;
+  }
+
+  const componentSet = figma.combineAsVariants(components, tooltipPage);
+  componentSet.name = "Tooltip";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Tooltip Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 600;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
+  mainTitle.characters = "Tooltip";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
+  mainDesc.characters = "Tooltips provide helpful hints and additional context.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, tooltipMap[size.name]);
+  }
+
+  componentSet.description = `Tooltip Component
+
+Tooltips provide helpful hints and additional context.
+
+Properties:
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Tooltips created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Pagination Component
+// ═══════════════════════════════════════════════════════════
+async function createPagination(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
+
+  let paginationPage = figma.root.children.find(p => p.name === "Pagination") as PageNode | undefined;
+  if (!paginationPage) { paginationPage = figma.createPage(); paginationPage.name = "Pagination"; }
+  paginationPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(paginationPage);
+
+  for (const child of [...paginationPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const states = ["Default", "Active", "Disabled"];
+  const sizes = [
+    { name: "SM", size: 32, fontSize: 12 },
+    { name: "MD", size: 40, fontSize: 14 },
+    { name: "LG", size: 48, fontSize: 16 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const paginationMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const pageBtn = figma.createComponent();
+      pageBtn.name = `State=${state}, Size=${size.name}`;
+      pageBtn.layoutMode = "HORIZONTAL";
+      pageBtn.primaryAxisSizingMode = "FIXED";
+      pageBtn.counterAxisSizingMode = "FIXED";
+      pageBtn.counterAxisAlignItems = "CENTER";
+      pageBtn.primaryAxisAlignItems = "CENTER";
+      pageBtn.resize(size.size, size.size);
+      pageBtn.cornerRadius = 6;
+
+      if (state === "Active") {
+        applyVariableToFill(pageBtn, "interactive/primary", primaryRgb);
+      } else if (state === "Disabled") {
+        applyVariableToFill(pageBtn, "bg/secondary", { r: 0.96, g: 0.96, b: 0.96 });
+      } else {
+        applyVariableToFill(pageBtn, "bg/primary", { r: 1, g: 1, b: 1 });
+        applyVariableToStroke(pageBtn, "border/default", { r: 0.9, g: 0.9, b: 0.9 });
+        pageBtn.strokeWeight = 1;
+      }
+
+      const text = figma.createText();
+      text.fontName = { family: "Pretendard", style: state === "Active" ? "Medium" : "Regular" };
+      text.fontSize = size.fontSize;
+      text.characters = "1";
+
+      if (state === "Active") {
+        text.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      } else if (state === "Disabled") {
+        applyVariableToFill(text, "text/disabled", { r: 0.7, g: 0.7, b: 0.7 });
+      } else {
+        applyVariableToFill(text, "text/primary", { r: 0.1, g: 0.1, b: 0.1 });
+      }
+
+      pageBtn.appendChild(text);
+
+      components.push(pageBtn);
+      paginationMap[`${state}-${size.name}`] = pageBtn;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, paginationPage);
+  componentSet.name = "Pagination";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Pagination Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 800;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
+  mainTitle.characters = "Pagination";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
+  mainDesc.characters = "Pagination allows users to navigate through pages of content.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const stateContent = await createPropertySection(docFrame, "State", "Visual states for page numbers.", 0);
+  for (const state of states) {
+    await createValueItem(stateContent, state, paginationMap[`${state}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, paginationMap[`Default-${size.name}`]);
+  }
+
+  componentSet.description = `Pagination Component
+
+Pagination allows users to navigate through pages of content.
+
+Properties:
+• State: Default, Active, Disabled
+• Size: SM (32px), MD (40px), LG (48px)`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Pagination created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Tab Component
+// ═══════════════════════════════════════════════════════════
+async function createTabs(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
+
+  let tabPage = figma.root.children.find(p => p.name === "Tabs") as PageNode | undefined;
+  if (!tabPage) { tabPage = figma.createPage(); tabPage.name = "Tabs"; }
+  tabPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(tabPage);
+
+  for (const child of [...tabPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  const states = ["Default", "Active"];
+  const sizes = [
+    { name: "SM", paddingX: 12, paddingY: 8, fontSize: 13, borderHeight: 2 },
+    { name: "MD", paddingX: 16, paddingY: 12, fontSize: 14, borderHeight: 3 },
+    { name: "LG", paddingX: 20, paddingY: 16, fontSize: 16, borderHeight: 4 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const tabMap: Record<string, ComponentNode> = {};
+
+  for (const state of states) {
+    for (const size of sizes) {
+      const tab = figma.createComponent();
+      tab.name = `State=${state}, Size=${size.name}`;
+      tab.layoutMode = "VERTICAL";
+      tab.primaryAxisSizingMode = "AUTO";
+      tab.counterAxisSizingMode = "AUTO";
+      tab.paddingLeft = size.paddingX;
+      tab.paddingRight = size.paddingX;
+      tab.paddingTop = size.paddingY;
+      tab.paddingBottom = size.paddingY;
+      tab.fills = [];
+
+      const text = figma.createText();
+      text.fontName = { family: "Pretendard", style: state === "Active" ? "Medium" : "Regular" };
+      text.fontSize = size.fontSize;
+      text.characters = "Tab";
+
+      if (state === "Active") {
+        applyVariableToFill(text, "text/brand", primaryRgb);
+      } else {
+        applyVariableToFill(text, "text/secondary", { r: 0.5, g: 0.5, b: 0.5 });
+      }
+
+      tab.appendChild(text);
+
+      // Bottom border for active state
+      if (state === "Active") {
+        tab.strokeWeight = size.borderHeight;
+        tab.strokeAlign = "INSIDE";
+        tab.strokes = [{ type: "SOLID", color: primaryRgb }];
+        // Only bottom border using individual stroke weights
+        tab.strokeTopWeight = 0;
+        tab.strokeRightWeight = 0;
+        tab.strokeLeftWeight = 0;
+        tab.strokeBottomWeight = size.borderHeight;
+      }
+
+      components.push(tab);
+      tabMap[`${state}-${size.name}`] = tab;
+    }
+  }
+
+  const componentSet = figma.combineAsVariants(components, tabPage);
+  componentSet.name = "Tab";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Tab Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 600;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
+  mainTitle.characters = "Tab";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
+  mainDesc.characters = "Tabs organize content into separate views where only one view is visible at a time.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const stateContent = await createPropertySection(docFrame, "State", "Visual states for tab items.", 0);
+  for (const state of states) {
+    await createValueItem(stateContent, state, tabMap[`${state}-MD`]);
+  }
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different contexts.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, tabMap[`Default-${size.name}`]);
+  }
+
+  componentSet.description = `Tab Component
+
+Tabs organize content into separate views where only one view is visible at a time.
+
+Properties:
+• State: Default, Active
+• Size: SM, MD, LG`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Tabs created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Modal Component
+// ═══════════════════════════════════════════════════════════
+async function createModals(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "SemiBold" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
+
+  let modalPage = figma.root.children.find(p => p.name === "Modals") as PageNode | undefined;
+  if (!modalPage) { modalPage = figma.createPage(); modalPage.name = "Modals"; }
+  modalPage.backgrounds = [LIGHT_BG];
+  await figma.setCurrentPageAsync(modalPage);
+
+  for (const child of [...modalPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const sizes = [
+    { name: "SM", width: 400, contentHeight: 120 },
+    { name: "MD", width: 560, contentHeight: 200 },
+    { name: "LG", width: 720, contentHeight: 320 },
+  ];
+
+  const components: ComponentNode[] = [];
+  const modalMap: Record<string, ComponentNode> = {};
+
+  for (const size of sizes) {
+    const modal = figma.createComponent();
+    modal.name = `Size=${size.name}`;
+    modal.layoutMode = "VERTICAL";
+    modal.primaryAxisSizingMode = "FIXED";
+    modal.counterAxisSizingMode = "AUTO";
+    modal.resize(size.width, 100);
+    modal.paddingTop = 24;
+    modal.paddingBottom = 24;
+    modal.paddingLeft = 24;
+    modal.paddingRight = 24;
+    modal.itemSpacing = 20;
+    modal.cornerRadius = 12;
+    modal.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+    modal.strokes = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.9 } }];
+    modal.strokeWeight = 1;
+    modal.effects = [{
+      type: "DROP_SHADOW",
+      color: { r: 0, g: 0, b: 0, a: 0.1 },
+      offset: { x: 0, y: 4 },
+      radius: 12,
+      visible: true,
+      blendMode: "NORMAL"
+    }];
+
+    // Header
+    const header = figma.createFrame();
+    header.name = "Header";
+    header.layoutMode = "HORIZONTAL";
+    header.primaryAxisSizingMode = "FIXED";
+    header.counterAxisSizingMode = "AUTO";
+    header.primaryAxisAlignItems = "SPACE_BETWEEN";
+    header.counterAxisAlignItems = "CENTER";
+    header.resize(size.width - 48, 28);
+    header.fills = [];
+
+    const title = figma.createText();
+    title.fontName = { family: "Pretendard", style: "SemiBold" };
+    title.fontSize = 18;
+    title.characters = "Modal Title";
+    title.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.1 } }];
+    header.appendChild(title);
+
+    modal.appendChild(header);
+
+    // Content
+    const content = figma.createFrame();
+    content.name = "Content";
+    content.layoutMode = "VERTICAL";
+    content.primaryAxisSizingMode = "FIXED";
+    content.counterAxisSizingMode = "FIXED";
+    content.resize(size.width - 48, size.contentHeight);
+    content.fills = [];
+
+    const bodyText = figma.createText();
+    bodyText.fontName = { family: "Pretendard", style: "Regular" };
+    bodyText.fontSize = 14;
+    bodyText.characters = "Modal content goes here.";
+    bodyText.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+    bodyText.resize(size.width - 48, bodyText.height);
+    bodyText.textAutoResize = "HEIGHT";
+    content.appendChild(bodyText);
+
+    modal.appendChild(content);
+
+    components.push(modal);
+    modalMap[size.name] = modal;
+  }
+
+  const componentSet = figma.combineAsVariants(components, modalPage);
+  componentSet.name = "Modal";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Create documentation frame
+  const docFrame = figma.createFrame();
+  docFrame.name = "Modal Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 32;
+  docFrame.x = 900;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const titleFrame = figma.createFrame();
+  titleFrame.name = "Title";
+  titleFrame.layoutMode = "VERTICAL";
+  titleFrame.primaryAxisSizingMode = "AUTO";
+  titleFrame.counterAxisSizingMode = "AUTO";
+  titleFrame.itemSpacing = 8;
+  titleFrame.fills = [];
+
+  const mainTitle = figma.createText();
+  mainTitle.fontName = { family: "Pretendard", style: "Bold" };
+  mainTitle.fontSize = 30;
+  mainTitle.letterSpacing = { value: -0.6, unit: "PIXELS" };
+  mainTitle.characters = "Modal";
+  mainTitle.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
+  titleFrame.appendChild(mainTitle);
+
+  const mainDesc = figma.createText();
+  mainDesc.fontName = { family: "Pretendard", style: "Regular" };
+  mainDesc.fontSize = 14;
+  mainDesc.letterSpacing = { value: -0.28, unit: "PIXELS" };
+  mainDesc.characters = "Modals focus user attention on a specific task or message.";
+  mainDesc.fills = [{ type: "SOLID", color: { r: 0.0, g: 0.0, b: 0.0 } }];
+  titleFrame.appendChild(mainDesc);
+
+  docFrame.appendChild(titleFrame);
+
+  const sizeContent = await createPropertySection(docFrame, "Size", "Size variants for different content lengths.", 0);
+  for (const size of sizes) {
+    await createValueItem(sizeContent, size.name, modalMap[size.name]);
+  }
+
+  componentSet.description = `Modal Component
+
+Modals focus user attention on a specific task or message.
+
+Properties:
+• Size: SM (400px), MD (560px), LG (720px)`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Modals created! (" + components.length + " variants)", "success");
+}
+
 async function createIcons() {
   sendStatus("Creating icons...");
 
@@ -3462,6 +4003,10 @@ figma.ui.onmessage = async (msg) => {
       case "create-separators": await createSeparators(msg.colors); break;
       case "create-spinners": await createSpinners(msg.colors); break;
       case "create-alerts": await createAlerts(msg.colors); break;
+      case "create-tooltips": await createTooltips(msg.colors); break;
+      case "create-pagination": await createPagination(msg.colors); break;
+      case "create-tabs": await createTabs(msg.colors); break;
+      case "create-modals": await createModals(msg.colors); break;
       case "create-all": await createAll(msg.colors); break;
     }
   } catch (error) {
