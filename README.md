@@ -21,6 +21,7 @@ Figma 플러그인으로 디자인 시스템을 자동 생성합니다.
 - SVG 포맷으로 코드에 직접 포함 (외부 링크 의존성 없음)
 - Documentation 스타일의 깔끔한 레이아웃
 - 자동 줄바꿈 그리드 형식
+- **정적 리소스**: 초기 생성 후 icons-data.json에 고정, 디자이너가 Figma에서 직접 수정 가능
 
 ### Components (Atoms)
 - **Buttons** - Type (Primary, Secondary, Outline, Ghost) × State × Size
@@ -89,13 +90,15 @@ figma-plugin/
 ├── manifest.json      # 플러그인 메타데이터
 ├── code.ts            # 플러그인 메인 코드
 ├── ui.html            # 플러그인 UI
-├── icons-data.json    # 82개 아이콘 SVG 데이터
+├── icons-data.json    # 82개 아이콘 SVG 데이터 (정적 리소스)
 ├── icons-data.ts      # 아이콘 데이터 TypeScript
-├── extract-icons.py   # Figma API에서 아이콘 추출 스크립트
 ├── package.json
 ├── tsconfig.json
 └── dist/
     └── code.js        # 빌드 출력
+
+archive/
+└── extract-icons.py   # 아이콘 추출 스크립트 (초기 생성 시 사용, 참고용 보관)
 ```
 
 ## Development
