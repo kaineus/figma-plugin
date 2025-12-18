@@ -23,19 +23,26 @@ Figma 플러그인으로 디자인 시스템을 자동 생성합니다.
 - 자동 줄바꿈 그리드 형식
 - **정적 리소스**: 초기 생성 후 icons-data.json에 고정, 디자이너가 Figma에서 직접 수정 가능
 
-### Components (Atoms)
-- **Buttons** - Type (Primary, Secondary, Outline, Ghost) × State × Size
-- **Inputs** - State (Default, Focus, Disabled) × Size (SM, MD, LG)
-- **Checkboxes** - State (Unchecked, Checked, Disabled) × Size (SM, MD, LG)
-- **Radios** - State (Unchecked, Checked, Disabled) × Size (SM, MD, LG)
-- **Toggles** - State (Off, On, Disabled) × Size (SM, MD, LG)
-- **Cards** - Style (Default, Outlined, Elevated) × Size (SM, MD, LG)
-- **Badges** - Type (Primary, Success, Warning, Danger, Gray) × Size
-- **Avatars** - Size variants (XS, SM, MD, LG, XL)
-- **Chips** - State (Default, Active, Disabled) × Size (SM, MD, LG)
-- **Dividers** - Orientation (Horizontal, Vertical) × Weight (Thin, Medium, Thick)
-- **Spinners** - Size variants (XS, SM, MD, LG, XL)
+### Components (Atoms) - 20개
 - **Alerts** - Type (Info, Success, Warning, Error)
+- **Avatars** - Size variants (XS, SM, MD, LG, XL)
+- **Badges** - Type (Primary, Success, Warning, Danger, Gray) × Size
+- **Buttons** - Type (Primary, Secondary, Outline, Ghost) × State × Size
+- **Cards** - Style (Default, Outlined, Elevated) × Size (SM, MD, LG)
+- **Checkboxes** - State (Unchecked, Checked, Disabled) × Size (SM, MD, LG)
+- **Chips** - State (Default, Active, Disabled) × Size (SM, MD, LG)
+- **Inputs** - State (Default, Focus, Error, Disabled) × Size (SM, MD, LG)
+- **Labels** - State (Default, Required, Disabled) × Size (SM, MD, LG)
+- **Links** - State (Default, Hover, Visited, Disabled) × Size (SM, MD, LG)
+- **Progress** - Value (0%, 25%, 50%, 75%, 100%) × Size (SM, MD, LG)
+- **Radios** - State (Unchecked, Checked, Disabled) × Size (SM, MD, LG)
+- **Separators** - Orientation (Horizontal, Vertical) × Weight (Thin, Medium, Thick)
+- **Skeletons** - Type (Text, Circle, Rectangle) × Size (SM, MD, LG)
+- **Sliders** - Value (0%, 50%, 100%) × Size (SM, MD, LG)
+- **Spinners** - Size variants (SM, MD, LG, XL)
+- **Switches** - State (Off, On, Disabled) × Size (SM, MD, LG)
+- **Textareas** - State (Default, Focus, Error, Disabled) × Size (SM, MD, LG)
+- **Toggles** - Options (2, 3) × Size (SM, MD, LG) - Segmented controls
 
 ### Design Token Structure
 
@@ -73,13 +80,15 @@ npm run build
 
 1. 플러그인 실행
 2. Primary/Secondary 색상 선택
-3. 버튼 클릭:
+3. 개별 컴포넌트 생성 또는 전체 생성:
    - **1. Foundations** - 페이지 구조, Variables, Typography, Color Palette 생성
    - **3. Icons** - 82개 시스템 아이콘 생성 (10px~24px, Weather)
-   - **4. Components - Basic** - Buttons, Inputs, Checkboxes, Radios, Toggles
-   - **5. Components - Display** - Cards, Badges, Avatars, Chips
-   - **6. Components - Layout** - Dividers, Spinners, Alerts
-4. 또는 **전체 디자인 시스템 생성** 클릭
+   - **5. Components - Display** - 20개 Atoms 컴포넌트 (알파벳 순 정렬)
+     - Alerts, Avatars, Badges, Buttons, Cards, Checkboxes, Chips
+     - Inputs, Labels, Links, Progress, Radios, Separators, Skeletons, Sliders
+     - Spinners, Switches, Textareas, Toggles
+   - **6. Components - Layout** - Separators, Spinners, Alerts
+4. 또는 **전체 디자인 시스템 생성** 클릭 (모든 Foundations + Icons + 20개 Atoms)
 
 각 컴포넌트는 Component Set(숨김)과 Documentation Frame으로 구성되며, Library로 publish하면 정상적으로 사용 가능합니다.
 
