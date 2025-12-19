@@ -4226,7 +4226,23 @@ async function createIcons() {
     // Process icons
     for (const iconData of icons) {
       try {
-        // Create icon container (no background)
+        // Create SVG node
+        const svgNode = figma.createNodeFromSvg(iconData.svg);
+        svgNode.name = iconData.name;
+
+        // Create component from SVG
+        const component = figma.createComponent();
+        component.name = `Icons/${iconData.name}`;
+        component.resize(svgNode.width, svgNode.height);
+        component.fills = [];
+        component.appendChild(svgNode);
+
+        // Position component off-screen (will be hidden from main view)
+        component.x = -10000;
+        component.y = 0;
+        iconsPage.appendChild(component);
+
+        // Create display container with instance
         const iconContainer = figma.createFrame();
         iconContainer.name = iconData.name;
         iconContainer.fills = [];
@@ -4236,10 +4252,9 @@ async function createIcons() {
         iconContainer.itemSpacing = 4;
         iconContainer.counterAxisAlignItems = "CENTER";
 
-        // Create SVG node from string (no background frame)
-        const svgNode = figma.createNodeFromSvg(iconData.svg);
-        svgNode.name = iconData.name;
-        iconContainer.appendChild(svgNode);
+        // Add instance of the component
+        const instance = component.createInstance();
+        iconContainer.appendChild(instance);
 
         // Create label
         const labelText = figma.createText();
@@ -4264,6 +4279,1317 @@ async function createIcons() {
   sendStatus(`Icons created! (${totalIconsCreated} icons)`, "success");
 }
 
+// Helper function to get Calendar icon from Icons page
+function getCalendarIcon(size: number): SceneNode {
+  const iconsPage = figma.root.children.find(p => p.name === "Icons") as PageNode;
+  if (iconsPage) {
+    // Find 14px-calendar component (smallest calendar icon)
+    const calComponent = iconsPage.findOne(n =>
+      n.type === "COMPONENT" &&
+      n.name.toLowerCase().includes("14px-calendar")
+    ) as ComponentNode;
+
+    if (calComponent) {
+      const instance = calComponent.createInstance();
+      instance.resize(size, size);
+      return instance;
+    }
+  }
+
+  // Fallback: create simple SVG calendar icon
+  const calendarSvg = `
+    <svg width="${size}" height="${size}" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <rect x="2" y="3" width="12" height="11" rx="1.5" stroke="#666" stroke-width="1.2" fill="none"/>
+      <line x1="2" y1="6" x2="14" y2="6" stroke="#666" stroke-width="1.2"/>
+      <line x1="5" y1="1" x2="5" y2="4" stroke="#666" stroke-width="1.2" stroke-linecap="round"/>
+      <line x1="11" y1="1" x2="11" y2="4" stroke="#666" stroke-width="1.2" stroke-linecap="round"/>
+    </svg>
+  `;
+
+  try {
+    const icon = figma.createNodeFromSvg(calendarSvg);
+    icon.resize(size, size);
+    return icon;
+  } catch (e) {
+    // Last resort fallback
+    const rect = figma.createRectangle();
+    rect.resize(size, size);
+    rect.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+    rect.cornerRadius = 2;
+    return rect;
+  }
+}
+
+// Helper function to get 10px-more icon from Icons page (chevron down)
+function getChevronIcon(size: number): SceneNode {
+  const iconsPage = figma.root.children.find(p => p.name === "Icons") as PageNode;
+  if (iconsPage) {
+    // Find 10px-more component (smallest chevron down)
+    const chevronComponent = iconsPage.findOne(n =>
+      n.type === "COMPONENT" &&
+      n.name.toLowerCase().includes("10px-more")
+    ) as ComponentNode;
+
+    if (chevronComponent) {
+      const instance = chevronComponent.createInstance();
+      instance.resize(size, size);
+      return instance;
+    }
+  }
+
+  // Fallback: use createChevronDownIcon
+  return createChevronDownIcon(size, { r: 0.4, g: 0.4, b: 0.4 });
+}
+
+// Helper function to get Arrow Left icon from Icons page
+function getArrowLeftIcon(size: number): SceneNode {
+  const iconsPage = figma.root.children.find(p => p.name === "Icons") as PageNode;
+  if (iconsPage) {
+    // Find expand-left component (Icons/14px-expand-left)
+    const arrowComponent = iconsPage.findOne(n =>
+      n.type === "COMPONENT" &&
+      n.name.toLowerCase().includes("expand-left")
+    ) as ComponentNode;
+
+    if (arrowComponent) {
+      const instance = arrowComponent.createInstance();
+      instance.resize(size, size);
+      return instance;
+    }
+  }
+
+  // Fallback: use createArrowLeftIcon
+  return createArrowLeftIcon(size, { r: 0.4, g: 0.4, b: 0.4 });
+}
+
+// Helper function to get Arrow Right icon from Icons page
+function getArrowRightIcon(size: number): SceneNode {
+  const iconsPage = figma.root.children.find(p => p.name === "Icons") as PageNode;
+  if (iconsPage) {
+    // Find expand-right component (Icons/14px-expand-right)
+    const arrowComponent = iconsPage.findOne(n =>
+      n.type === "COMPONENT" &&
+      n.name.toLowerCase().includes("expand-right")
+    ) as ComponentNode;
+
+    if (arrowComponent) {
+      const instance = arrowComponent.createInstance();
+      instance.resize(size, size);
+      return instance;
+    }
+  }
+
+  // Fallback: use createArrowRightIcon
+  return createArrowRightIcon(size, { r: 0.4, g: 0.4, b: 0.4 });
+}
+
+// ============================================
+// SVG VECTOR ICON HELPERS (from Hoban fresh code)
+// ============================================
+
+// 캘린더 아이콘
+function createCalendarIcon(size: number, color: RGB): VectorNode {
+  const vector = figma.createVector();
+  vector.name = "CalendarIcon";
+  // Calendar SVG path
+  vector.vectorPaths = [{
+    windingRule: "EVENODD",
+    data: "M 3 4 L 3 2 L 5 2 L 5 4 L 11 4 L 11 2 L 13 2 L 13 4 L 15 4 C 15.55 4 16 4.45 16 5 L 16 15 C 16 15.55 15.55 16 15 16 L 1 16 C 0.45 16 0 15.55 0 15 L 0 5 C 0 4.45 0.45 4 1 4 L 3 4 Z M 2 7 L 2 14 L 14 14 L 14 7 L 2 7 Z M 4 9 L 6 9 L 6 11 L 4 11 L 4 9 Z M 7 9 L 9 9 L 9 11 L 7 11 L 7 9 Z M 10 9 L 12 9 L 12 11 L 10 11 L 10 9 Z"
+  }];
+  vector.resize(size, size);
+  vector.fills = [{ type: 'SOLID', color: color }];
+  return vector;
+}
+
+// 시계 아이콘
+function createClockIcon(size: number, color: RGB): VectorNode {
+  const vector = figma.createVector();
+  vector.name = "ClockIcon";
+  vector.vectorPaths = [{
+    windingRule: "EVENODD",
+    data: "M 8 0 C 3.58 0 0 3.58 0 8 C 0 12.42 3.58 16 8 16 C 12.42 16 16 12.42 16 8 C 16 3.58 12.42 0 8 0 Z M 8 14 C 4.69 14 2 11.31 2 8 C 2 4.69 4.69 2 8 2 C 11.31 2 14 4.69 14 8 C 14 11.31 11.31 14 8 14 Z M 7 4 L 9 4 L 9 8.5 L 12 10.5 L 11 12 L 7 9.5 L 7 4 Z"
+  }];
+  vector.resize(size, size);
+  vector.fills = [{ type: 'SOLID', color: color }];
+  return vector;
+}
+
+// 왼쪽 화살표
+function createArrowLeftIcon(size: number, color: RGB): VectorNode {
+  const vector = figma.createVector();
+  vector.name = "ArrowLeftIcon";
+  vector.vectorPaths = [{
+    windingRule: "NONZERO",
+    data: "M 10 2 L 4 8 L 10 14"
+  }];
+  vector.resize(size, size);
+  vector.fills = [];
+  vector.strokes = [{ type: 'SOLID', color: color }];
+  vector.strokeWeight = 2;
+  vector.strokeCap = "ROUND";
+  vector.strokeJoin = "ROUND";
+  return vector;
+}
+
+// 오른쪽 화살표
+function createArrowRightIcon(size: number, color: RGB): VectorNode {
+  const vector = figma.createVector();
+  vector.name = "ArrowRightIcon";
+  vector.vectorPaths = [{
+    windingRule: "NONZERO",
+    data: "M 6 2 L 12 8 L 6 14"
+  }];
+  vector.resize(size, size);
+  vector.fills = [];
+  vector.strokes = [{ type: 'SOLID', color: color }];
+  vector.strokeWeight = 2;
+  vector.strokeCap = "ROUND";
+  vector.strokeJoin = "ROUND";
+  return vector;
+}
+
+// 아래 화살표 (드롭다운용)
+function createChevronDownIcon(size: number, color: RGB): VectorNode {
+  const vector = figma.createVector();
+  vector.name = "ChevronDownIcon";
+  vector.vectorPaths = [{
+    windingRule: "NONZERO",
+    data: "M 2 4 L 8 10 L 14 4"
+  }];
+  vector.resize(size, size);
+  vector.fills = [];
+  vector.strokes = [{ type: 'SOLID', color: color }];
+  vector.strokeWeight = 2;
+  vector.strokeCap = "ROUND";
+  vector.strokeJoin = "ROUND";
+  return vector;
+}
+
+// SVG Reference Date Input Field - rx="6.5"
+function createHobanDateInput(dateValue: string, x: number, y: number, state: string): FrameNode {
+  const input = figma.createFrame();
+  input.name = `DateInput-${state}`;
+  input.resize(200, 36);
+  input.x = x;
+  input.y = y;
+  input.cornerRadius = 6.5; // SVG Reference: rx="6.5"
+
+  // SVG Reference 정확한 색상값
+  const defaultBorder: RGB = { r: 0.73333, g: 0.74902, b: 0.81176 }; // #BBBFCF
+  const focusBorder: RGB = { r: 0.58039, g: 0.60000, b: 0.69412 }; // #9499B1
+  const disableBg: RGB = { r: 0.94902, g: 0.94118, b: 0.94118 }; // #F2F0F0
+  const disableBorder: RGB = { r: 0.8, g: 0.8, b: 0.8 }; // #CCCCCC
+
+  if (state === "default") {
+    input.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    input.strokes = [{ type: 'SOLID', color: defaultBorder }];
+  } else if (state === "focus") {
+    input.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+    input.strokes = [{ type: 'SOLID', color: focusBorder }];
+  } else if (state === "disable") {
+    input.fills = [{ type: 'SOLID', color: disableBg }];
+    input.strokes = [{ type: 'SOLID', color: disableBorder }];
+  }
+  input.strokeWeight = 1;
+
+  const dateText = figma.createText();
+  dateText.fontName = { family: "Arial", style: "Regular" };
+  dateText.characters = dateValue;
+  dateText.fontSize = 13;
+  dateText.fills = [{ type: 'SOLID', color: state === "disable" ? { r: 0.7, g: 0.7, b: 0.7 } : { r: 0.2, g: 0.2, b: 0.2 } }];
+  dateText.x = 12;
+  dateText.y = 10;
+  input.appendChild(dateText);
+
+  // Calendar icon from Icons page
+  const calIcon = getCalendarIcon(14);
+  calIcon.x = 174;
+  calIcon.y = 11;
+  input.appendChild(calIcon);
+
+  return input;
+}
+
+// SVG Reference Date Input with Label - +label variant
+function createHobanDateInputWithLabel(dateValue: string, x: number, y: number, state: string): FrameNode {
+  const wrapper = figma.createFrame();
+  wrapper.name = `DateInput-label-${state}`;
+  wrapper.resize(200, 56);
+  wrapper.x = x;
+  wrapper.y = y;
+  wrapper.fills = [];
+
+  // Label text
+  const label = figma.createText();
+  label.fontName = { family: "Arial", style: "Regular" };
+  label.characters = "Label";
+  label.fontSize = 12;
+  label.fills = [{ type: 'SOLID', color: { r: 0.4, g: 0.4, b: 0.4 } }];
+  label.x = 0;
+  label.y = 0;
+  wrapper.appendChild(label);
+
+  // Input field
+  const input = figma.createFrame();
+  input.name = `DateInput-field`;
+  input.resize(200, 36);
+  input.x = 0;
+  input.y = 20;
+  input.cornerRadius = 6.5; // SVG Reference: rx="6.5"
+
+  const focusBorder: RGB = { r: 0.58039, g: 0.60000, b: 0.69412 }; // #9499B1
+  input.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+  input.strokes = [{ type: 'SOLID', color: focusBorder }];
+  input.strokeWeight = 1;
+
+  const dateText = figma.createText();
+  dateText.fontName = { family: "Arial", style: "Regular" };
+  dateText.characters = dateValue;
+  dateText.fontSize = 13;
+  dateText.fills = [{ type: 'SOLID', color: { r: 0.2, g: 0.2, b: 0.2 } }];
+  dateText.x = 12;
+  dateText.y = 10;
+  input.appendChild(dateText);
+
+  const calIcon = getCalendarIcon(14);
+  calIcon.x = 174;
+  calIcon.y = 11;
+  input.appendChild(calIcon);
+
+  wrapper.appendChild(input);
+
+  return wrapper;
+}
+
+// ═══════════════════════════════════════════════════════════
+// Date Picker Component (Molecule) - Hoban Style (SVG Reference)
+// ═══════════════════════════════════════════════════════════
+async function createDatePickers(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
+
+  let datePickerPage = figma.root.children.find(p => p.name === "Date Pickers") as PageNode | undefined;
+  if (!datePickerPage) { datePickerPage = figma.createPage(); datePickerPage.name = "Date Pickers"; }
+  datePickerPage.backgrounds = [{ type: "SOLID", color: { r: 0.98, g: 0.98, b: 0.98 } }];
+  await figma.setCurrentPageAsync(datePickerPage);
+
+  for (const child of [...datePickerPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+
+  // Variants from Figma design
+  const variants = [
+    { type: "DateInput", state: "Default" },
+    { type: "DateInput", state: "Focus" },
+    { type: "DateInput", state: "Disable" },
+    { type: "DateInput", state: "+label" },
+    { type: "CalendarDropdown", state: "WithArrows" },
+    { type: "CalendarDropdown", state: "WithDropdowns" }
+  ];
+
+  const components: ComponentNode[] = [];
+  const datePickerMap: Record<string, ComponentNode> = {};
+
+  // Load Arial font for SVG Reference style
+  await figma.loadFontAsync({ family: "Arial", style: "Regular" });
+  await figma.loadFontAsync({ family: "Arial", style: "Bold" });
+
+  // SVG Reference exact colors
+  const primaryBlue: RGB = { r: 0, g: 0.34117, b: 1 }; // #0057FF - selected date
+  const defaultBorder: RGB = { r: 0.73333, g: 0.74902, b: 0.81176 }; // #BBBFCF
+  const prevMonthText: RGB = { r: 0.82745, g: 0.82745, b: 0.82745 }; // #D3D3D3
+
+  for (const { type, state } of variants) {
+    const comp = figma.createComponent();
+    comp.name = `Type=${type}, State=${state}`;
+
+    if (type === "DateInput") {
+      const hasLabel = state === "+label";
+
+      if (hasLabel) {
+        // +label variant using helper function
+        comp.resize(200, 56);
+        comp.fills = [];
+
+        // Label text
+        const label = figma.createText();
+        label.fontName = { family: "Arial", style: "Regular" };
+        label.fontSize = 12;
+        label.characters = "Label";
+        label.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+        label.x = 0;
+        label.y = 0;
+        comp.appendChild(label);
+
+        // Input field using exact positioning
+        const input = figma.createFrame();
+        input.name = "DateInput-field";
+        input.resize(200, 36);
+        input.x = 0;
+        input.y = 20;
+        input.cornerRadius = 6.5;
+        input.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+        input.strokes = [{ type: 'SOLID', color: { r: 0.58039, g: 0.60000, b: 0.69412 } }]; // Focus border
+        input.strokeWeight = 1;
+
+        const dateText = figma.createText();
+        dateText.fontName = { family: "Arial", style: "Regular" };
+        dateText.characters = "2025-01-15";
+        dateText.fontSize = 13;
+        dateText.fills = [{ type: 'SOLID', color: { r: 0.2, g: 0.2, b: 0.2 } }];
+        dateText.x = 12;
+        dateText.y = 10;
+        input.appendChild(dateText);
+
+        const calIcon = getCalendarIcon(14);
+        calIcon.x = 174;
+        calIcon.y = 11;
+        input.appendChild(calIcon);
+
+        comp.appendChild(input);
+      } else {
+        // Regular Date Input using exact SVG Reference positioning
+        comp.resize(200, 36);
+        comp.cornerRadius = 6.5;
+
+        // Exact SVG Reference colors
+        const defaultBorder: RGB = { r: 0.73333, g: 0.74902, b: 0.81176 }; // #BBBFCF
+        const focusBorder: RGB = { r: 0.58039, g: 0.60000, b: 0.69412 }; // #9499B1
+        const disableBg: RGB = { r: 0.94902, g: 0.94118, b: 0.94118 }; // #F2F0F0
+        const disableBorder: RGB = { r: 0.8, g: 0.8, b: 0.8 }; // #CCCCCC
+
+        if (state === "Default") {
+          comp.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+          comp.strokes = [{ type: 'SOLID', color: defaultBorder }];
+        } else if (state === "Focus") {
+          comp.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+          comp.strokes = [{ type: 'SOLID', color: focusBorder }];
+        } else if (state === "Disable") {
+          comp.fills = [{ type: 'SOLID', color: disableBg }];
+          comp.strokes = [{ type: 'SOLID', color: disableBorder }];
+        }
+        comp.strokeWeight = 1;
+
+        const dateText = figma.createText();
+        dateText.fontName = { family: "Arial", style: "Regular" };
+        dateText.characters = "2025-01-15";
+        dateText.fontSize = 13;
+        dateText.fills = [{ type: 'SOLID', color: state === "Disable" ? { r: 0.7, g: 0.7, b: 0.7 } : { r: 0.2, g: 0.2, b: 0.2 } }];
+        dateText.x = 12;
+        dateText.y = 10;
+        comp.appendChild(dateText);
+
+        // Calendar icon from Icons page positioned at x=174, y=11 for proper spacing
+        const calIcon = getCalendarIcon(14);
+        calIcon.x = 174;
+        calIcon.y = 11;
+        comp.appendChild(calIcon);
+      }
+
+    } else {
+      // Calendar Dropdown - Two styles
+      const isWithArrows = state === "WithArrows";
+
+      comp.resize(180, 200); // Compact size matching screenshots
+      comp.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      comp.cornerRadius = 8;
+      comp.strokes = [{ type: "SOLID", color: { r: 0.85, g: 0.85, b: 0.85 } }];
+      comp.strokeWeight = 1;
+      comp.effects = [{
+        type: 'DROP_SHADOW',
+        color: { r: 0, g: 0, b: 0, a: 0.1 },
+        offset: { x: 0, y: 2 },
+        radius: 8,
+        visible: true,
+        blendMode: 'NORMAL'
+      }];
+
+      // Calendar header
+      const calHeader = figma.createFrame();
+      calHeader.resize(180, 32);
+      calHeader.x = 0;
+      calHeader.y = 12;
+      calHeader.fills = [];
+
+      if (isWithArrows) {
+        // Style 1: < 2025년 05월 > (using 14px-expand icons, smallest available)
+        const prevBtn = figma.createFrame();
+        prevBtn.resize(20, 20);
+        prevBtn.x = 8;
+        prevBtn.y = 6;
+        prevBtn.fills = [];
+
+        const prevIcon = getArrowLeftIcon(14);
+        prevIcon.x = 3;
+        prevIcon.y = 3;
+        prevBtn.appendChild(prevIcon);
+        calHeader.appendChild(prevBtn);
+
+        const dateText = figma.createText();
+        dateText.fontName = { family: "Arial", style: "Regular" };
+        dateText.characters = "2025년 05월";
+        dateText.fontSize = 13;
+        dateText.fills = [{ type: 'SOLID', color: { r: 0.2, g: 0.2, b: 0.2 } }];
+        dateText.textAlignHorizontal = "CENTER";
+        dateText.x = 60;
+        dateText.y = 8;
+        calHeader.appendChild(dateText);
+
+        const nextBtn = figma.createFrame();
+        nextBtn.resize(20, 20);
+        nextBtn.x = 152;
+        nextBtn.y = 6;
+        nextBtn.fills = [];
+
+        const nextIcon = getArrowRightIcon(14);
+        nextIcon.x = 3;
+        nextIcon.y = 3;
+        nextBtn.appendChild(nextIcon);
+        calHeader.appendChild(nextBtn);
+      } else {
+        // Style 2: 2025년 ∨  05월 ∨
+        const yearSelector = figma.createFrame();
+        yearSelector.resize(60, 24);
+        yearSelector.x = 24;
+        yearSelector.y = 4;
+        yearSelector.fills = [];
+
+        const yearText = figma.createText();
+        yearText.fontName = { family: "Arial", style: "Regular" };
+        yearText.characters = "2025년";
+        yearText.fontSize = 13;
+        yearText.fills = [{ type: 'SOLID', color: { r: 0.2, g: 0.2, b: 0.2 } }];
+        yearText.x = 0;
+        yearText.y = 4;
+        yearSelector.appendChild(yearText);
+
+        const yearArrow = getChevronIcon(8);
+        yearArrow.x = 48;
+        yearArrow.y = 8;
+        yearSelector.appendChild(yearArrow);
+        calHeader.appendChild(yearSelector);
+
+        const monthSelector = figma.createFrame();
+        monthSelector.resize(50, 24);
+        monthSelector.x = 96;
+        monthSelector.y = 4;
+        monthSelector.fills = [];
+
+        const monthText = figma.createText();
+        monthText.fontName = { family: "Arial", style: "Regular" };
+        monthText.characters = "05월";
+        monthText.fontSize = 13;
+        monthText.fills = [{ type: 'SOLID', color: { r: 0.2, g: 0.2, b: 0.2 } }];
+        monthText.x = 0;
+        monthText.y = 4;
+        monthSelector.appendChild(monthText);
+
+        const monthArrow = getChevronIcon(8);
+        monthArrow.x = 34;
+        monthArrow.y = 8;
+        monthSelector.appendChild(monthArrow);
+        calHeader.appendChild(monthSelector);
+      }
+
+      comp.appendChild(calHeader);
+
+      // Day headers - English (M T W T F S S)
+      const days = ["M", "T", "W", "T", "F", "S", "S"];
+      const cellSize = 22;
+      const gridWidth = 7 * cellSize;
+      const leftMargin = (180 - gridWidth) / 2;
+
+      days.forEach((day, idx) => {
+        const dayText = figma.createText();
+        dayText.fontName = { family: "Arial", style: "Regular" };
+        dayText.characters = day;
+        dayText.fontSize = 11;
+        dayText.fills = [{ type: 'SOLID', color: { r: 0.6, g: 0.6, b: 0.6 } }];
+        dayText.textAlignHorizontal = "CENTER";
+        dayText.x = leftMargin + idx * cellSize + 7;
+        dayText.y = 54;
+        comp.appendChild(dayText);
+      });
+
+      // Calendar days - Compact style (4 rows x 7 cols)
+      // 2025년 5월 달력 (1일=목, 선택=5일)
+      const calDays = [
+        [null, null, null, 1, 2, 3, 4],
+        [5, 6, 7, 8, 9, 10, 11],
+        [12, 13, 14, 15, 16, 17, 18],
+        [19, 20, 21, 22, 23, 24, 25],
+        [26, 27, 28, 29, 30, 31, null]
+      ];
+
+      const textColor: RGB = { r: 0.2, g: 0.2, b: 0.2 };
+
+      calDays.forEach((week, weekIdx) => {
+        week.forEach((day, dayIdx) => {
+          const isSelected = day === 5; // 5일 selected
+
+          const dayCell = figma.createFrame();
+          dayCell.resize(cellSize, cellSize);
+          dayCell.x = leftMargin + dayIdx * cellSize;
+          dayCell.y = 72 + weekIdx * (cellSize + 2);
+
+          if (isSelected) {
+            // Selected date - blue circle
+            dayCell.cornerRadius = cellSize / 2; // full circle
+            dayCell.fills = [{ type: 'SOLID', color: primaryBlue }];
+          } else {
+            dayCell.cornerRadius = cellSize / 2;
+            dayCell.fills = [];
+          }
+
+          if (day !== null) {
+            const dayNum = figma.createText();
+            dayNum.fontName = { family: "Arial", style: "Regular" };
+            dayNum.characters = day.toString();
+            dayNum.fontSize = 12;
+
+            if (isSelected) {
+              // Selected date white text
+              dayNum.fills = [{ type: 'SOLID', color: { r: 1, g: 1, b: 1 } }];
+            } else {
+              // Regular text
+              dayNum.fills = [{ type: 'SOLID', color: textColor }];
+            }
+
+            dayNum.textAlignHorizontal = "CENTER";
+            dayNum.x = day >= 10 ? 5 : 8;
+            dayNum.y = 5;
+            dayCell.appendChild(dayNum);
+          }
+
+          comp.appendChild(dayCell);
+        });
+      });
+    }
+
+    components.push(comp);
+    datePickerMap[`${type}-${state}`] = comp;
+  }
+
+  // Create component set
+  const componentSet = figma.combineAsVariants(components, datePickerPage);
+  componentSet.name = "Molecules/DatePicker";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Documentation
+  const docFrame = figma.createFrame();
+  docFrame.name = "Date Picker Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 24;
+  docFrame.x = 500;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  // Title
+  const title = figma.createText();
+  title.fontName = { family: "Pretendard", style: "Bold" };
+  title.fontSize = 28;
+  title.characters = "Date Picker";
+  title.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
+  docFrame.appendChild(title);
+
+  // Description
+  const desc = figma.createText();
+  desc.fontName = { family: "Pretendard", style: "Regular" };
+  desc.fontSize = 14;
+  desc.characters = "날짜 선택 - Calendar date selection (SVG Reference)";
+  desc.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+  docFrame.appendChild(desc);
+
+  // Examples section
+  const examplesFrame = figma.createFrame();
+  examplesFrame.name = "Examples";
+  examplesFrame.layoutMode = "VERTICAL";
+  examplesFrame.primaryAxisSizingMode = "AUTO";
+  examplesFrame.counterAxisSizingMode = "AUTO";
+  examplesFrame.itemSpacing = 16;
+  examplesFrame.fills = [];
+
+  for (const variant of variants) {
+    const example = figma.createFrame();
+    example.layoutMode = "VERTICAL";
+    example.primaryAxisSizingMode = "AUTO";
+    example.counterAxisSizingMode = "AUTO";
+    example.itemSpacing = 8;
+    example.fills = [];
+
+    const label = figma.createText();
+    label.fontName = { family: "Pretendard", style: "Medium" };
+    label.fontSize = 11;
+    label.characters = `${variant.type} (SVG Reference - r=${variant.type === "DateInput" ? "6.5" : "6.5"})`;
+    label.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+    example.appendChild(label);
+
+    const stateLabel = figma.createText();
+    stateLabel.fontName = { family: "Pretendard", style: "Regular" };
+    stateLabel.fontSize = 10;
+    stateLabel.characters = variant.state;
+    stateLabel.fills = [{ type: "SOLID", color: { r: 0.6, g: 0.6, b: 0.6 } }];
+    example.appendChild(stateLabel);
+
+    const instance = datePickerMap[`${variant.type}-${variant.state}`].createInstance();
+    example.appendChild(instance);
+
+    examplesFrame.appendChild(example);
+  }
+  docFrame.appendChild(examplesFrame);
+
+  componentSet.description = `Date Picker - Calendar date selection component
+
+Properties:
+• Type: DateInput, CalendarDropdown
+• State: Default, Focus, Disable, +label`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Date Pickers created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// Time Picker Component (Molecule) - 실제 Figma 디자인 기반
+// ═══════════════════════════════════════════════════════════
+async function createTimePickers(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
+
+  let timePickerPage = figma.root.children.find(p => p.name === "Time Pickers") as PageNode | undefined;
+  if (!timePickerPage) { timePickerPage = figma.createPage(); timePickerPage.name = "Time Pickers"; }
+  timePickerPage.backgrounds = [{ type: "SOLID", color: { r: 0.98, g: 0.98, b: 0.98 } }];
+  await figma.setCurrentPageAsync(timePickerPage);
+
+  for (const child of [...timePickerPage.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+  const modes = ["TimeInput", "TimeDropdown"];
+  const components: ComponentNode[] = [];
+  const timePickerMap: Record<string, ComponentNode> = {};
+
+  for (const mode of modes) {
+    const comp = figma.createComponent();
+    comp.name = `Mode=${mode}`;
+
+    if (mode === "TimeInput") {
+      // Time Input: "09:30 AM" + clock icon
+      comp.resize(100, 36);
+      comp.cornerRadius = 6.5;
+      comp.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      comp.strokes = [{ type: "SOLID", color: { r: 0.85, g: 0.85, b: 0.85 } }];
+      comp.strokeWeight = 1;
+      comp.layoutMode = "HORIZONTAL";
+      comp.primaryAxisAlignItems = "SPACE_BETWEEN";
+      comp.counterAxisAlignItems = "CENTER";
+      comp.paddingLeft = 12;
+      comp.paddingRight = 12;
+
+      const timeText = figma.createText();
+      timeText.fontName = { family: "Pretendard", style: "Regular" };
+      timeText.fontSize = 14;
+      timeText.characters = "09:30 AM";
+      timeText.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+      comp.appendChild(timeText);
+
+      const clockIcon = getCalendarIcon(16);
+      comp.appendChild(clockIcon);
+
+    } else {
+      // Time Dropdown: Hour | Min | AM/PM columns
+      comp.resize(180, 180);
+      comp.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      comp.cornerRadius = 8;
+      comp.strokes = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.9 } }];
+      comp.strokeWeight = 1;
+      comp.layoutMode = "VERTICAL";
+      comp.paddingTop = 12;
+      comp.paddingBottom = 12;
+      comp.itemSpacing = 8;
+
+      // Column headers
+      const headers = figma.createFrame();
+      headers.resize(156, 20);
+      headers.layoutMode = "HORIZONTAL";
+      headers.itemSpacing = 0;
+      headers.fills = [];
+
+      const headerLabels = ["Hour", "Min", "AM/PM"];
+      for (let i = 0; i < 3; i++) {
+        const headerText = figma.createText();
+        headerText.fontName = { family: "Pretendard", style: "Medium" };
+        headerText.fontSize = 11;
+        headerText.characters = headerLabels[i];
+        headerText.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+        headerText.textAlignHorizontal = "CENTER";
+        headerText.resize(52, 20);
+        headers.appendChild(headerText);
+      }
+      comp.appendChild(headers);
+
+      // Time columns
+      const columns = figma.createFrame();
+      columns.resize(156, 136);
+      columns.layoutMode = "HORIZONTAL";
+      columns.itemSpacing = 0;
+      columns.fills = [];
+
+      // Hour column
+      const hourCol = figma.createFrame();
+      hourCol.resize(52, 136);
+      hourCol.layoutMode = "VERTICAL";
+      hourCol.itemSpacing = 2;
+      hourCol.fills = [];
+
+      const hours = ["05", "06", "07", "08", "09", "10", "11"];
+      for (const hour of hours) {
+        const isSelected = hour === "09";
+        const hourItem = figma.createFrame();
+        hourItem.resize(52, 18);
+        hourItem.cornerRadius = 4;
+        hourItem.layoutMode = "HORIZONTAL";
+        hourItem.primaryAxisAlignItems = "CENTER";
+        hourItem.counterAxisAlignItems = "CENTER";
+        hourItem.fills = isSelected ? [{ type: "SOLID", color: primaryRgb }] : [];
+
+        const hourText = figma.createText();
+        hourText.fontName = { family: "Pretendard", style: isSelected ? "Bold" : "Regular" };
+        hourText.fontSize = 13;
+        hourText.characters = hour;
+        hourText.fills = [{ type: "SOLID", color: isSelected ? { r: 1, g: 1, b: 1 } : { r: 0.2, g: 0.2, b: 0.2 } }];
+        hourText.textAlignHorizontal = "CENTER";
+        hourItem.appendChild(hourText);
+
+        hourCol.appendChild(hourItem);
+      }
+      columns.appendChild(hourCol);
+
+      // Min column
+      const minCol = figma.createFrame();
+      minCol.resize(52, 136);
+      minCol.layoutMode = "VERTICAL";
+      minCol.itemSpacing = 2;
+      minCol.fills = [];
+
+      const mins = ["00", "15", "30", "45"];
+      for (const min of mins) {
+        const isSelected = min === "30";
+        const minItem = figma.createFrame();
+        minItem.resize(52, 18);
+        minItem.cornerRadius = 4;
+        minItem.layoutMode = "HORIZONTAL";
+        minItem.primaryAxisAlignItems = "CENTER";
+        minItem.counterAxisAlignItems = "CENTER";
+        minItem.fills = isSelected ? [{ type: "SOLID", color: primaryRgb }] : [];
+
+        const minText = figma.createText();
+        minText.fontName = { family: "Pretendard", style: isSelected ? "Bold" : "Regular" };
+        minText.fontSize = 13;
+        minText.characters = min;
+        minText.fills = [{ type: "SOLID", color: isSelected ? { r: 1, g: 1, b: 1 } : { r: 0.2, g: 0.2, b: 0.2 } }];
+        minText.textAlignHorizontal = "CENTER";
+        minItem.appendChild(minText);
+
+        minCol.appendChild(minItem);
+      }
+      columns.appendChild(minCol);
+
+      // AM/PM column
+      const ampmCol = figma.createFrame();
+      ampmCol.resize(52, 136);
+      ampmCol.layoutMode = "VERTICAL";
+      ampmCol.itemSpacing = 2;
+      ampmCol.fills = [];
+
+      const ampms = ["AM", "PM"];
+      for (const ampm of ampms) {
+        const isSelected = ampm === "AM";
+        const ampmItem = figma.createFrame();
+        ampmItem.resize(52, 18);
+        ampmItem.cornerRadius = 4;
+        ampmItem.layoutMode = "HORIZONTAL";
+        ampmItem.primaryAxisAlignItems = "CENTER";
+        ampmItem.counterAxisAlignItems = "CENTER";
+        ampmItem.fills = isSelected ? [{ type: "SOLID", color: primaryRgb }] : [];
+
+        const ampmText = figma.createText();
+        ampmText.fontName = { family: "Pretendard", style: isSelected ? "Bold" : "Regular" };
+        ampmText.fontSize = 13;
+        ampmText.characters = ampm;
+        ampmText.fills = [{ type: "SOLID", color: isSelected ? { r: 1, g: 1, b: 1 } : { r: 0.2, g: 0.2, b: 0.2 } }];
+        ampmText.textAlignHorizontal = "CENTER";
+        ampmItem.appendChild(ampmText);
+
+        ampmCol.appendChild(ampmItem);
+      }
+      columns.appendChild(ampmCol);
+
+      comp.appendChild(columns);
+    }
+
+    components.push(comp);
+    timePickerMap[mode] = comp;
+  }
+
+  const componentSet = figma.combineAsVariants(components, timePickerPage);
+  componentSet.name = "Molecules/TimePicker";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Documentation
+  const docFrame = figma.createFrame();
+  docFrame.name = "Time Picker Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 24;
+  docFrame.x = 500;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const title = figma.createText();
+  title.fontName = { family: "Pretendard", style: "Bold" };
+  title.fontSize = 28;
+  title.characters = "Time Picker";
+  title.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
+  docFrame.appendChild(title);
+
+  const desc = figma.createText();
+  desc.fontName = { family: "Pretendard", style: "Regular" };
+  desc.fontSize = 14;
+  desc.characters = "Time selection component";
+  desc.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+  docFrame.appendChild(desc);
+
+  const examplesFrame = figma.createFrame();
+  examplesFrame.layoutMode = "VERTICAL";
+  examplesFrame.primaryAxisSizingMode = "AUTO";
+  examplesFrame.counterAxisSizingMode = "AUTO";
+  examplesFrame.itemSpacing = 16;
+  examplesFrame.fills = [];
+
+  for (const mode of modes) {
+    const example = figma.createFrame();
+    example.layoutMode = "VERTICAL";
+    example.primaryAxisSizingMode = "AUTO";
+    example.counterAxisSizingMode = "AUTO";
+    example.itemSpacing = 8;
+    example.fills = [];
+
+    const label = figma.createText();
+    label.fontName = { family: "Pretendard", style: "Medium" };
+    label.fontSize = 11;
+    label.characters = mode;
+    label.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+    example.appendChild(label);
+
+    const instance = timePickerMap[mode].createInstance();
+    example.appendChild(instance);
+
+    examplesFrame.appendChild(example);
+  }
+  docFrame.appendChild(examplesFrame);
+
+  componentSet.description = `Time Picker - Time selection component
+
+Properties:
+• Mode: TimeInput, TimeDropdown`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("Time Pickers created! (" + components.length + " variants)", "success");
+}
+
+// ═══════════════════════════════════════════════════════════
+// DateTime Picker Component (Organism) - 실제 Figma 디자인 기반
+// ═══════════════════════════════════════════════════════════
+async function createDateTimePickers(colors: { primary: string; secondary: string }) {
+  await figma.loadFontAsync({ family: "Pretendard", style: "Regular" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Medium" });
+  await figma.loadFontAsync({ family: "Pretendard", style: "Bold" });
+
+  let page = figma.root.children.find(p => p.name === "DateTime Pickers") as PageNode | undefined;
+  if (!page) { page = figma.createPage(); page.name = "DateTime Pickers"; }
+  page.backgrounds = [{ type: "SOLID", color: { r: 0.98, g: 0.98, b: 0.98 } }];
+  await figma.setCurrentPageAsync(page);
+
+  for (const child of [...page.children]) {
+    try { child.remove(); } catch (e) { /* skip */ }
+  }
+
+  const primaryRgb = hexToRgb(colors.primary);
+  const layouts = ["Combined", "Inline", "Separated"];
+  const components: ComponentNode[] = [];
+  const pickerMap: Record<string, ComponentNode> = {};
+
+  for (const layout of layouts) {
+    const comp = figma.createComponent();
+    comp.name = `Layout=${layout}`;
+
+    if (layout === "Combined") {
+      // DateTime Picker (Date + Time Combined)
+      comp.resize(400, 350);
+      comp.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      comp.cornerRadius = 12;
+      comp.strokes = [{ type: "SOLID", color: { r: 0.9, g: 0.9, b: 0.9 } }];
+      comp.strokeWeight = 1;
+      comp.layoutMode = "VERTICAL";
+      comp.paddingLeft = 20;
+      comp.paddingRight = 20;
+      comp.paddingTop = 20;
+      comp.paddingBottom = 20;
+      comp.itemSpacing = 16;
+
+      // Main content area with calendar + time selector
+      const mainContent = figma.createFrame();
+      mainContent.resize(360, 240);
+      mainContent.layoutMode = "HORIZONTAL";
+      mainContent.itemSpacing = 16;
+      mainContent.fills = [];
+
+      // Left: Calendar placeholder
+      const calendarArea = figma.createFrame();
+      calendarArea.resize(180, 240);
+      calendarArea.fills = [{ type: "SOLID", color: { r: 0.98, g: 0.98, b: 0.98 } }];
+      calendarArea.cornerRadius = 8;
+      calendarArea.layoutMode = "HORIZONTAL";
+      calendarArea.primaryAxisAlignItems = "CENTER";
+      calendarArea.counterAxisAlignItems = "CENTER";
+
+      const calText = figma.createText();
+      calText.fontName = { family: "Pretendard", style: "Regular" };
+      calText.fontSize = 12;
+      calText.characters = "Calendar\n2025년 12월\n15일 선택";
+      calText.textAlignHorizontal = "CENTER";
+      calText.fills = [{ type: "SOLID", color: { r: 0.6, g: 0.6, b: 0.6 } }];
+      calendarArea.appendChild(calText);
+
+      mainContent.appendChild(calendarArea);
+
+      // Right: Time selector
+      const timeArea = figma.createFrame();
+      timeArea.resize(164, 240);
+      timeArea.fills = [];
+      timeArea.layoutMode = "VERTICAL";
+      timeArea.itemSpacing = 12;
+
+      const timeTitle = figma.createText();
+      timeTitle.fontName = { family: "Pretendard", style: "Bold" };
+      timeTitle.fontSize = 14;
+      timeTitle.characters = "Select Time";
+      timeTitle.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+      timeArea.appendChild(timeTitle);
+
+      const timePlaceholder = figma.createFrame();
+      timePlaceholder.resize(164, 180);
+      timePlaceholder.fills = [{ type: "SOLID", color: { r: 0.98, g: 0.98, b: 0.98 } }];
+      timePlaceholder.cornerRadius = 8;
+      timePlaceholder.layoutMode = "HORIZONTAL";
+      timePlaceholder.primaryAxisAlignItems = "CENTER";
+      timePlaceholder.counterAxisAlignItems = "CENTER";
+
+      const timeText = figma.createText();
+      timeText.fontName = { family: "Pretendard", style: "Regular" };
+      timeText.fontSize = 12;
+      timeText.characters = "14:30\nAM/PM\nQuick Select";
+      timeText.textAlignHorizontal = "CENTER";
+      timeText.fills = [{ type: "SOLID", color: { r: 0.6, g: 0.6, b: 0.6 } }];
+      timePlaceholder.appendChild(timeText);
+
+      timeArea.appendChild(timePlaceholder);
+      mainContent.appendChild(timeArea);
+
+      comp.appendChild(mainContent);
+
+      // Bottom: Selected info + buttons
+      const bottomBar = figma.createFrame();
+      bottomBar.resize(360, 36);
+      bottomBar.layoutMode = "HORIZONTAL";
+      bottomBar.primaryAxisAlignItems = "SPACE_BETWEEN";
+      bottomBar.counterAxisAlignItems = "CENTER";
+      bottomBar.fills = [];
+
+      const selectedInfo = figma.createText();
+      selectedInfo.fontName = { family: "Pretendard", style: "Regular" };
+      selectedInfo.fontSize = 12;
+      selectedInfo.characters = "Selected: Dec 15, 2025 at 2:30 PM";
+      selectedInfo.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+      bottomBar.appendChild(selectedInfo);
+
+      const buttons = figma.createFrame();
+      buttons.layoutMode = "HORIZONTAL";
+      buttons.itemSpacing = 8;
+      buttons.primaryAxisSizingMode = "AUTO";
+      buttons.counterAxisSizingMode = "AUTO";
+      buttons.fills = [];
+
+      const cancelBtn = figma.createFrame();
+      cancelBtn.resize(70, 32);
+      cancelBtn.cornerRadius = 6;
+      cancelBtn.fills = [{ type: "SOLID", color: { r: 0.95, g: 0.95, b: 0.95 } }];
+      cancelBtn.layoutMode = "HORIZONTAL";
+      cancelBtn.primaryAxisAlignItems = "CENTER";
+      cancelBtn.counterAxisAlignItems = "CENTER";
+
+      const cancelText = figma.createText();
+      cancelText.fontName = { family: "Pretendard", style: "Medium" };
+      cancelText.fontSize = 13;
+      cancelText.characters = "Cancel";
+      cancelText.fills = [{ type: "SOLID", color: { r: 0.3, g: 0.3, b: 0.3 } }];
+      cancelBtn.appendChild(cancelText);
+      buttons.appendChild(cancelBtn);
+
+      const applyBtn = figma.createFrame();
+      applyBtn.resize(70, 32);
+      applyBtn.cornerRadius = 6;
+      applyBtn.fills = [{ type: "SOLID", color: primaryRgb }];
+      applyBtn.layoutMode = "HORIZONTAL";
+      applyBtn.primaryAxisAlignItems = "CENTER";
+      applyBtn.counterAxisAlignItems = "CENTER";
+
+      const applyText = figma.createText();
+      applyText.fontName = { family: "Pretendard", style: "Medium" };
+      applyText.fontSize = 13;
+      applyText.characters = "Apply";
+      applyText.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      applyBtn.appendChild(applyText);
+      buttons.appendChild(applyBtn);
+
+      bottomBar.appendChild(buttons);
+      comp.appendChild(bottomBar);
+
+    } else if (layout === "Inline") {
+      // Inline DateTime Input
+      comp.layoutMode = "HORIZONTAL";
+      comp.primaryAxisSizingMode = "AUTO";
+      comp.counterAxisSizingMode = "AUTO";
+      comp.itemSpacing = 12;
+      comp.fills = [];
+
+      // Date input
+      const dateInput = figma.createFrame();
+      dateInput.resize(140, 36);
+      dateInput.cornerRadius = 6.5;
+      dateInput.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      dateInput.strokes = [{ type: "SOLID", color: { r: 0.85, g: 0.85, b: 0.85 } }];
+      dateInput.strokeWeight = 1;
+      dateInput.layoutMode = "HORIZONTAL";
+      dateInput.primaryAxisAlignItems = "SPACE_BETWEEN";
+      dateInput.counterAxisAlignItems = "CENTER";
+      dateInput.paddingLeft = 12;
+      dateInput.paddingRight = 12;
+
+      const dateText = figma.createText();
+      dateText.fontName = { family: "Pretendard", style: "Regular" };
+      dateText.fontSize = 14;
+      dateText.characters = "2025-12-15";
+      dateText.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+      dateInput.appendChild(dateText);
+
+      const calIcon = getCalendarIcon(16);
+      dateInput.appendChild(calIcon);
+
+      comp.appendChild(dateInput);
+
+      // Time input
+      const timeInput = figma.createFrame();
+      timeInput.resize(120, 36);
+      timeInput.cornerRadius = 6.5;
+      timeInput.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      timeInput.strokes = [{ type: "SOLID", color: { r: 0.85, g: 0.85, b: 0.85 } }];
+      timeInput.strokeWeight = 1;
+      timeInput.layoutMode = "HORIZONTAL";
+      timeInput.primaryAxisAlignItems = "SPACE_BETWEEN";
+      timeInput.counterAxisAlignItems = "CENTER";
+      timeInput.paddingLeft = 12;
+      timeInput.paddingRight = 12;
+
+      const timeText = figma.createText();
+      timeText.fontName = { family: "Pretendard", style: "Regular" };
+      timeText.fontSize = 14;
+      timeText.characters = "2:30 PM";
+      timeText.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+      timeInput.appendChild(timeText);
+
+      const clockIcon = getCalendarIcon(16);
+      timeInput.appendChild(clockIcon);
+
+      // Dropdown arrow
+      const arrow = figma.createText();
+      arrow.fontName = { family: "Pretendard", style: "Regular" };
+      arrow.fontSize = 12;
+      arrow.characters = "▼";
+      arrow.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+      timeInput.appendChild(arrow);
+
+      comp.appendChild(timeInput);
+
+    } else {
+      // Separated: 날짜 및 시간 입력 분리
+      comp.layoutMode = "VERTICAL";
+      comp.primaryAxisSizingMode = "AUTO";
+      comp.counterAxisSizingMode = "AUTO";
+      comp.itemSpacing = 8;
+      comp.fills = [];
+
+      // Label
+      const label = figma.createText();
+      label.fontName = { family: "Pretendard", style: "Medium" };
+      label.fontSize = 12;
+      label.characters = "날짜 및 시간 입력 분리";
+      label.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+      comp.appendChild(label);
+
+      // Input row
+      const inputRow = figma.createFrame();
+      inputRow.layoutMode = "HORIZONTAL";
+      inputRow.primaryAxisSizingMode = "AUTO";
+      inputRow.counterAxisSizingMode = "AUTO";
+      inputRow.itemSpacing = 12;
+      inputRow.fills = [];
+
+      // Date input with dropdown
+      const dateInput = figma.createFrame();
+      dateInput.resize(140, 36);
+      dateInput.cornerRadius = 6.5;
+      dateInput.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      dateInput.strokes = [{ type: "SOLID", color: { r: 0.85, g: 0.85, b: 0.85 } }];
+      dateInput.strokeWeight = 1;
+      dateInput.layoutMode = "HORIZONTAL";
+      dateInput.primaryAxisAlignItems = "SPACE_BETWEEN";
+      dateInput.counterAxisAlignItems = "CENTER";
+      dateInput.paddingLeft = 12;
+      dateInput.paddingRight = 12;
+
+      const dateText = figma.createText();
+      dateText.fontName = { family: "Pretendard", style: "Regular" };
+      dateText.fontSize = 14;
+      dateText.characters = "2025-12-15";
+      dateText.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+      dateInput.appendChild(dateText);
+
+      const dateArrow = figma.createText();
+      dateArrow.fontName = { family: "Pretendard", style: "Regular" };
+      dateArrow.fontSize = 12;
+      dateArrow.characters = "▼";
+      dateArrow.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+      dateInput.appendChild(dateArrow);
+
+      inputRow.appendChild(dateInput);
+
+      // Time input with dropdown
+      const timeInput = figma.createFrame();
+      timeInput.resize(100, 36);
+      timeInput.cornerRadius = 6.5;
+      timeInput.fills = [{ type: "SOLID", color: { r: 1, g: 1, b: 1 } }];
+      timeInput.strokes = [{ type: "SOLID", color: { r: 0.85, g: 0.85, b: 0.85 } }];
+      timeInput.strokeWeight = 1;
+      timeInput.layoutMode = "HORIZONTAL";
+      timeInput.primaryAxisAlignItems = "SPACE_BETWEEN";
+      timeInput.counterAxisAlignItems = "CENTER";
+      timeInput.paddingLeft = 12;
+      timeInput.paddingRight = 12;
+
+      const timeText = figma.createText();
+      timeText.fontName = { family: "Pretendard", style: "Regular" };
+      timeText.fontSize = 14;
+      timeText.characters = "14:30";
+      timeText.fills = [{ type: "SOLID", color: { r: 0.2, g: 0.2, b: 0.2 } }];
+      timeInput.appendChild(timeText);
+
+      const timeArrow = figma.createText();
+      timeArrow.fontName = { family: "Pretendard", style: "Regular" };
+      timeArrow.fontSize = 12;
+      timeArrow.characters = "▼";
+      timeArrow.fills = [{ type: "SOLID", color: { r: 0.4, g: 0.4, b: 0.4 } }];
+      timeInput.appendChild(timeArrow);
+
+      inputRow.appendChild(timeInput);
+
+      comp.appendChild(inputRow);
+    }
+
+    components.push(comp);
+    pickerMap[layout] = comp;
+  }
+
+  const componentSet = figma.combineAsVariants(components, page);
+  componentSet.name = "Organisms/DateTimePicker";
+  componentSet.x = 100;
+  componentSet.y = 100;
+  componentSet.visible = false;
+
+  // Documentation
+  const docFrame = figma.createFrame();
+  docFrame.name = "DateTime Picker Documentation";
+  docFrame.layoutMode = "VERTICAL";
+  docFrame.primaryAxisSizingMode = "AUTO";
+  docFrame.counterAxisSizingMode = "AUTO";
+  docFrame.itemSpacing = 24;
+  docFrame.x = 900;
+  docFrame.y = 100;
+  docFrame.fills = [];
+
+  const title = figma.createText();
+  title.fontName = { family: "Pretendard", style: "Bold" };
+  title.fontSize = 28;
+  title.characters = "DateTime Picker";
+  title.fills = [{ type: "SOLID", color: { r: 0.1, g: 0.1, b: 0.15 } }];
+  docFrame.appendChild(title);
+
+  const desc = figma.createText();
+  desc.fontName = { family: "Pretendard", style: "Regular" };
+  desc.fontSize = 14;
+  desc.characters = "Combined date and time selection component";
+  desc.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+  docFrame.appendChild(desc);
+
+  const examplesFrame = figma.createFrame();
+  examplesFrame.layoutMode = "VERTICAL";
+  examplesFrame.primaryAxisSizingMode = "AUTO";
+  examplesFrame.counterAxisSizingMode = "AUTO";
+  examplesFrame.itemSpacing = 24;
+  examplesFrame.fills = [];
+
+  for (const layout of layouts) {
+    const example = figma.createFrame();
+    example.layoutMode = "VERTICAL";
+    example.primaryAxisSizingMode = "AUTO";
+    example.counterAxisSizingMode = "AUTO";
+    example.itemSpacing = 8;
+    example.fills = [];
+
+    const label = figma.createText();
+    label.fontName = { family: "Pretendard", style: "Medium" };
+    label.fontSize = 11;
+    label.characters = layout;
+    label.fills = [{ type: "SOLID", color: { r: 0.5, g: 0.5, b: 0.5 } }];
+    example.appendChild(label);
+
+    const instance = pickerMap[layout].createInstance();
+    example.appendChild(instance);
+
+    examplesFrame.appendChild(example);
+  }
+  docFrame.appendChild(examplesFrame);
+
+  componentSet.description = `DateTime Picker - Combined date and time selection
+
+Properties:
+• Layout: Combined, Inline, Separated`;
+
+  figma.viewport.scrollAndZoomIntoView([docFrame]);
+  sendStatus("DateTime Pickers created! (" + components.length + " variants)", "success");
+}
 async function createAll(colors: { primary: string; secondary: string }) {
   try {
     sendStatus("1/29 Creating pages...");
@@ -4318,11 +5644,17 @@ async function createAll(colors: { primary: string; secondary: string }) {
     await createTooltips(colors);
     sendStatus("26/29 Creating pagination...");
     await createPagination(colors);
-    sendStatus("27/29 Creating tabs...");
+    sendStatus("27/32 Creating tabs...");
     await createTabs(colors);
-    sendStatus("28/29 Creating modals...");
+    sendStatus("28/32 Creating modals...");
     await createModals(colors);
-    sendStatus("29/29 Design system complete!", "success");
+    sendStatus("29/32 Creating date pickers...");
+    await createDatePickers(colors);
+    sendStatus("30/32 Creating time pickers...");
+    await createTimePickers(colors);
+    sendStatus("31/32 Creating datetime pickers...");
+    await createDateTimePickers(colors);
+    sendStatus("32/32 Design system complete!", "success");
   } catch (error) {
     sendStatus("Error: " + error, "error");
   }
@@ -4359,6 +5691,9 @@ figma.ui.onmessage = async (msg) => {
       case "create-pagination": await createPagination(msg.colors); break;
       case "create-tabs": await createTabs(msg.colors); break;
       case "create-modals": await createModals(msg.colors); break;
+      case "create-date-pickers": await createDatePickers(msg.colors); break;
+      case "create-time-pickers": await createTimePickers(msg.colors); break;
+      case "create-datetime-pickers": await createDateTimePickers(msg.colors); break;
       case "create-all": await createAll(msg.colors); break;
     }
   } catch (error) {

@@ -6,7 +6,7 @@ Figma 플러그인으로 디자인 시스템을 자동 생성하는 도구
 
 **GitHub:** https://github.com/kaineus/figma-plugin
 
-## 현재 상태 (2025-12-17)
+## 현재 상태 (2025-12-19)
 
 ### 완료된 작업
 
@@ -28,6 +28,7 @@ Figma 플러그인으로 디자인 시스템을 자동 생성하는 도구
 - [x] SVG 코드 직접 포함 (외부 링크 의존성 없음)
 - [x] Documentation 스타일 레이아웃 적용
 - [x] Python 스크립트로 Figma API에서 자동 추출
+- [x] **SVG를 Component로 변환** - 모든 아이콘이 재사용 가능한 Component Instance로 동작
 
 #### Atom Components (12개 완료)
 - [x] **Buttons** - Type × State × Size variants, Component Set + Documentation
@@ -43,10 +44,23 @@ Figma 플러그인으로 디자인 시스템을 자동 생성하는 도구
 - [x] **Spinners** - Size variants (XS, SM, MD, LG, XL) + Documentation
 - [x] **Alerts** - Type (Info, Success, Warning, Error) + Documentation
 
+#### Molecule Components (1개 완료)
+- [x] **Date Picker** - Component Set + Documentation
+  - **DateInput** variants: Default, Focus, Disable, +label (200×36px)
+  - **CalendarDropdown** variants: WithArrows, WithDropdowns (180×200px)
+  - Icons 페이지 컴포넌트 인스턴스 사용:
+    - 14px-calendar (DateInput)
+    - 14px-expand-left/right (WithArrows)
+    - 10px-more (WithDropdowns)
+  - 요일: 영문 (M T W T F S S)
+  - 선택된 날짜: 5일 (파란 원)
+  - 크기: 22px cells, 중앙 정렬
+
 #### 페이지 구조
-- [x] 컴포넌트별 독립 페이지 (Icons, Buttons, Inputs, Checkboxes, Radios, Toggles, Cards, Badges, Avatars, Chips, Dividers, Spinners, Alerts)
+- [x] 컴포넌트별 독립 페이지 (Icons, Buttons, Inputs, Checkboxes, Radios, Toggles, Cards, Badges, Avatars, Chips, Dividers, Spinners, Alerts, Date Pickers)
 - [x] Component Set 숨김 처리 (Documentation만 표시, Library publish 가능)
 - [x] Icons 페이지는 Documentation 스타일로 단일 프레임 구조
+- [x] Icons를 Component로 변환하여 다른 컴포넌트에서 인스턴스로 재사용
 
 #### 인프라
 - [x] GitHub 저장소 연결 및 푸시
@@ -57,6 +71,8 @@ Figma 플러그인으로 디자인 시스템을 자동 생성하는 도구
 ### 다음 작업 (TODO)
 
 #### 추가 컴포넌트 (Molecules/Organisms)
+- [ ] **Time Picker** - 시간 선택 컴포넌트
+- [ ] **DateTime Picker** - 날짜+시간 선택 컴포넌트
 - [ ] Select, Dropdown
 - [ ] Modal, Dialog
 - [ ] Toast, Notification
@@ -79,12 +95,13 @@ FIGMA_MCP/
 ├── .gitignore
 └── figma-plugin/
     ├── manifest.json         # 플러그인 메타데이터
-    ├── code.ts               # 플러그인 메인 코드 (~1200줄)
+    ├── code.ts               # 플러그인 메인 코드 (~4900줄)
     ├── ui.html               # 플러그인 UI
+    ├── icons-data.ts         # Icons SVG 데이터
     ├── package.json
     ├── tsconfig.json
     └── dist/
-        └── code.js           # 빌드 출력 (43kb)
+        └── code.js           # 빌드 출력 (274kb)
 ```
 
 ## 핵심 코드 구조 (code.ts)
@@ -97,9 +114,11 @@ FIGMA_MCP/
 | `createVariables()` | Variable Collections 생성 | ~100-400 |
 | `createTypography()` | Typography 문서화 | ~400-550 |
 | `createColors()` | Color Palette 문서화 | ~550-680 |
+| `createIcons()` | Icons 생성 (SVG → Component) | ~4100-4280 |
 | `createButtons()` | Button 컴포넌트 생성 | ~680-870 |
 | `createCards()` | Card 컴포넌트 생성 | ~870-1020 |
 | `createBadges()` | Badge 컴포넌트 생성 | ~1020-1180 |
+| `createDatePickers()` | Date Picker 컴포넌트 생성 | ~4567-4880 |
 
 ### Variable 헬퍼 함수
 
@@ -113,6 +132,30 @@ function applyVariableToFill(node, variableName, fallbackColor): void
 // Stroke에 Variable 적용
 function applyVariableToStroke(node, variableName, fallbackColor): void
 ```
+
+### Icon 헬퍼 함수
+
+Icons 페이지에서 컴포넌트 인스턴스를 가져오는 함수들:
+
+```typescript
+// Calendar icon (14px-calendar)
+function getCalendarIcon(size: number): SceneNode
+
+// Chevron down icon (10px-more)
+function getChevronIcon(size: number): SceneNode
+
+// Left arrow icon (14px-expand-left)
+function getArrowLeftIcon(size: number): SceneNode
+
+// Right arrow icon (14px-expand-right)
+function getArrowRightIcon(size: number): SceneNode
+```
+
+**동작 원리:**
+1. Icons 페이지에서 해당 컴포넌트 검색
+2. 컴포넌트 인스턴스 생성
+3. 요청된 크기로 resize
+4. 컴포넌트를 찾지 못하면 SVG fallback 사용
 
 ### Design Token 구조
 
